@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>OsteoAI — Choose Portal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html,body{height:100%;}
+    body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem;overflow:hidden;position:relative;}
+
+    /* Background image layer */
+    .bg-img{position:fixed;inset:0;z-index:0;}
+    .bg-img img{width:100%;height:100%;object-fit:cover;object-position:center;}
+    /* Dark overlay on top of image */
+    .bg-overlay{position:fixed;inset:0;z-index:1;background:linear-gradient(135deg,rgba(8,5,35,.88) 0%,rgba(20,16,60,.80) 40%,rgba(8,18,45,.88) 100%);backdrop-filter:blur(3px);}
+
+    .wrapper{position:relative;z-index:2;text-align:center;max-width:820px;width:100%;}
+
+    .logo-icon{width:76px;height:76px;border-radius:22px;background:linear-gradient(135deg,#7c3aed,#1d4ed8);display:inline-flex;align-items:center;justify-content:center;font-size:2.1rem;color:#fff;box-shadow:0 14px 44px rgba(124,58,237,.5);margin-bottom:1rem;animation:float 4s ease-in-out infinite;}
+    @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-9px);}}
+    .logo-title{font-size:2.4rem;font-weight:900;color:#fff;letter-spacing:-1.2px;}
+    .logo-sub{font-size:.88rem;color:rgba(255,255,255,.48);margin-top:.35rem;}
+
+    .portal-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:2.4rem 0 1.8rem;}
+    .portal-card{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.14);border-radius:24px;padding:2.3rem 1.9rem;text-decoration:none;display:block;transition:all .28s cubic-bezier(.4,0,.2,1);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);position:relative;overflow:hidden;text-align:left;}
+    .portal-card::after{content:'';position:absolute;inset:0;border-radius:24px;opacity:0;transition:opacity .28s;}
+    .portal-card.patient::after{background:linear-gradient(135deg,rgba(29,78,216,.22),rgba(56,189,248,.12));}
+    .portal-card.doctor::after{background:linear-gradient(135deg,rgba(124,58,237,.22),rgba(167,139,250,.12));}
+    .portal-card:hover{transform:translateY(-8px) scale(1.01);border-color:rgba(255,255,255,.3);box-shadow:0 30px 70px rgba(0,0,0,.45);}
+    .portal-card:hover::after{opacity:1;}
+
+    .card-icon{width:64px;height:64px;border-radius:18px;display:inline-flex;align-items:center;justify-content:center;font-size:1.7rem;margin-bottom:1.15rem;position:relative;z-index:1;}
+    .patient .card-icon{background:linear-gradient(135deg,#1d4ed8,#38bdf8);color:#fff;box-shadow:0 8px 28px rgba(29,78,216,.4);}
+    .doctor  .card-icon{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;box-shadow:0 8px 28px rgba(124,58,237,.4);}
+
+    .card-title{font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:.42rem;letter-spacing:-.3px;position:relative;z-index:1;}
+    .card-desc{font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.62;position:relative;z-index:1;}
+    .card-features{margin-top:1.15rem;display:flex;flex-direction:column;gap:.38rem;position:relative;z-index:1;}
+    .card-feature{font-size:.76rem;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:.45rem;}
+
+    .card-cta{margin-top:1.6rem;padding:.6rem 1.35rem;border-radius:11px;font-size:.82rem;font-weight:800;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:.45rem;transition:all .2s;position:relative;z-index:1;}
+    .patient .card-cta{background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff;box-shadow:0 4px 16px rgba(29,78,216,.35);}
+    .doctor  .card-cta{background:linear-gradient(135deg,#7c3aed,#9333ea);color:#fff;box-shadow:0 4px 16px rgba(124,58,237,.35);}
+    .card-cta:hover{opacity:.88;transform:scale(1.04);}
+
+    .footer-note{font-size:.72rem;color:rgba(255,255,255,.28);display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;}
+    .footer-note span{display:flex;align-items:center;gap:.3rem;}
+
+    @media(max-width:600px){.portal-grid{grid-template-columns:1fr;}.logo-title{font-size:1.85rem;}}
+  </style>
+</head>
+<body>
+
+<!-- Background image -->
+<div class="bg-img">
+  <img src="{{ url_for('static', filename='loginimage.jpeg') }}" alt="">
+</div>
+<!-- Dark overlay -->
+<div class="bg-overlay"></div>
+
+<div class="wrapper">
+  <div style="margin-bottom:2rem;">
+    <div class="logo-icon"><i class="fas fa-bone"></i></div>
+    <div class="logo-title">OsteoAI</div>
+    <div class="logo-sub">Clinical Osteoporosis Risk Assessment Platform</div>
+  </div>
+
+  <div class="portal-grid">
+
+    <!-- Patient -->
+    <a href="{{ url_for('patient_login') }}" class="portal-card patient">
+      <div class="card-icon"><i class="fas fa-user-injured"></i></div>
+      <div class="card-title">Patient Portal</div>
+      <div class="card-desc">Track your bone health, run AI risk assessments and manage personal health records.</div>
+      <div class="card-features">
+        <div class="card-feature"><i class="fas fa-check-circle" style="color:#38bdf8;"></i> Bone density risk assessment</div>
+        <div class="card-feature"><i class="fas fa-check-circle" style="color:#38bdf8;"></i> Nutrition &amp; exercise plans</div>
+        <div class="card-feature"><i class="fas fa-check-circle" style="color:#38bdf8;"></i> AI health assistant</div>
+        <div class="card-feature"><i class="fas fa-check-circle" style="color:#38bdf8;"></i> Health history &amp; PDF reports</div>
+      </div>
+      <div><span class="card-cta">Patient Login &nbsp;<i class="fas fa-arrow-right"></i></span></div>
+    </a>
+
+    <!-- Doctor -->
+    <a href="{{ url_for('doctor_login') }}" class="portal-card doctor">
+      <div class="card-icon"><i class="fas fa-user-doctor"></i></div>
+      <div class="card-title">Doctor Portal</div>
+      <div class="card-desc">Manage patients, generate prescriptions, view analytics and send clinical notifications.</div>
+      <div class="card-features">
+        <div class="card-feature"><i class="fas fa-check-circle" style="color:#a78bfa;"></i> Full patient analytics</div>
+        <div class="card-feature"><i class="fas fa-check-circle" style="color:#a78bfa;"></i> Prescription generator</div>
+        <div class="card-feature"><i class="fas fa-check-circle" style="color:#a78bfa;"></i> PDF report export</div>
+        <div class="card-feature"><i class="fas fa-check-circle" style="color:#a78bfa;"></i> Patient messaging</div>
+      </div>
+      <div><span class="card-cta">Doctor Login &nbsp;<i class="fas fa-arrow-right"></i></span></div>
+    </a>
+
+  </div>
+
+  <div class="footer-note">
+    <span><i class="fas fa-shield-halved" style="color:#a78bfa;"></i> SHA-256 Encrypted</span>
+    <span><i class="fas fa-lock" style="color:#38bdf8;"></i> HIPAA Compliant</span>
+    <span><i class="fas fa-bone" style="color:#a78bfa;"></i> OsteoAI v2.5</span>
+  </div>
+</div>
+</body>
+</html>

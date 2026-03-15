@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>OsteoAI — Patient Login</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;background:#f0f6ff;}
+
+    /* ── LEFT PANEL ── */
+    .left-panel{width:420px;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;padding:3rem 2.5rem;position:relative;overflow:hidden;}
+    .left-panel .lp-bg{position:absolute;inset:0;z-index:0;}
+    .left-panel .lp-bg img{width:100%;height:100%;object-fit:cover;object-position:center;}
+    .left-panel .lp-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(160deg,rgba(29,78,216,.92) 0%,rgba(3,105,161,.85) 50%,rgba(12,74,110,.92) 100%);}
+    .left-panel::before{content:'';position:absolute;width:380px;height:380px;border-radius:50%;background:rgba(255,255,255,.04);top:-80px;right:-80px;z-index:2;}
+    .left-panel::after{content:'';position:absolute;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.04);bottom:-60px;left:-60px;z-index:2;}
+    .brand{display:flex;align-items:center;gap:.75rem;margin-bottom:2.5rem;position:relative;z-index:3;}
+    .brand-icon{width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:#fff;border:1.5px solid rgba(255,255,255,.25);}
+    .brand-name{font-size:1.3rem;font-weight:900;color:#fff;letter-spacing:-.4px;}
+    .brand-sub{font-size:.68rem;color:rgba(255,255,255,.6);display:block;margin-top:.1rem;}
+    .panel-title{font-size:1.85rem;font-weight:900;color:#fff;letter-spacing:-.5px;line-height:1.2;position:relative;z-index:3;margin-bottom:.7rem;}
+    .panel-desc{font-size:.85rem;color:rgba(255,255,255,.6);line-height:1.65;position:relative;z-index:3;margin-bottom:2rem;}
+    .feature-list{display:flex;flex-direction:column;gap:.7rem;position:relative;z-index:3;}
+    .feature-item{display:flex;align-items:center;gap:.75rem;color:rgba(255,255,255,.8);font-size:.82rem;}
+    .feature-item .fi-icon{width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;}
+    .back-link{position:absolute;top:1.5rem;left:1.5rem;color:rgba(255,255,255,.6);text-decoration:none;font-size:.78rem;font-weight:600;display:flex;align-items:center;gap:.35rem;transition:color .18s;z-index:4;}
+    .back-link:hover{color:#fff;}
+
+    /* ── RIGHT PANEL ── */
+    .right-panel{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;}
+    .form-card{background:#fff;border-radius:22px;padding:2.4rem;width:100%;max-width:440px;box-shadow:0 8px 40px rgba(0,0,0,.08);border:1.5px solid #e5e7eb;}
+
+    .form-tabs{display:flex;gap:.4rem;background:#f1f5f9;border-radius:12px;padding:.3rem;margin-bottom:1.8rem;}
+    .form-tab{flex:1;padding:.52rem;border-radius:9px;border:none;font-size:.82rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:#6b7280;background:transparent;transition:all .18s;}
+    .form-tab.active{background:#fff;color:#1d4ed8;box-shadow:0 1px 4px rgba(0,0,0,.1);}
+
+    .form-title{font-size:1.2rem;font-weight:900;color:#111827;letter-spacing:-.3px;margin-bottom:.25rem;}
+    .form-subtitle{font-size:.78rem;color:#6b7280;margin-bottom:1.5rem;}
+
+    .form-group{margin-bottom:.95rem;}
+    .form-label{font-size:.76rem;font-weight:700;color:#374151;display:block;margin-bottom:.35rem;}
+    .form-control{width:100%;padding:.52rem .8rem;border:1.5px solid #e5e7eb;border-radius:10px;font-size:.84rem;outline:none;font-family:'DM Sans',sans-serif;color:#111827;transition:border-color .18s;}
+    .form-control:focus{border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,.08);}
+    .form-select{width:100%;padding:.52rem .8rem;border:1.5px solid #e5e7eb;border-radius:10px;font-size:.84rem;outline:none;font-family:'DM Sans',sans-serif;color:#111827;background:#fff;}
+    .form-select:focus{border-color:#1d4ed8;}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;}
+    .pw-wrap{position:relative;}
+    .pw-wrap .form-control{padding-right:2.6rem;}
+    .pw-toggle{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:0;}
+
+    .btn-primary{width:100%;padding:.62rem;background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff;border:none;border-radius:11px;font-size:.88rem;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:.4rem;transition:opacity .18s;display:flex;align-items:center;justify-content:center;gap:.5rem;}
+    .btn-primary:hover{opacity:.9;}
+
+    .divider{display:flex;align-items:center;gap:.75rem;margin:1.2rem 0;color:#9ca3af;font-size:.74rem;}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:#e5e7eb;}
+
+    .alert-error{background:#fef2f2;border:1.5px solid #fecaca;border-radius:10px;padding:.65rem .85rem;color:#b91c1c;font-size:.8rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;}
+
+    .strength-bar{margin-top:.3rem;height:4px;border-radius:2px;background:#e5e7eb;overflow:hidden;}
+    .strength-fill{height:100%;width:0%;transition:all .3s;border-radius:2px;}
+    .strength-label{font-size:.7rem;color:#6b7280;margin-top:.18rem;}
+
+    @media(max-width:860px){.left-panel{display:none;}.right-panel{padding:1.5rem;background:linear-gradient(160deg,#eff6ff,#fff);}}
+    @media(max-width:460px){.form-card{padding:1.6rem;border-radius:16px;}}
+  </style>
+</head>
+<body>
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+  <!-- Background image -->
+  <div class="lp-bg"><img src="{{ url_for('static', filename='loginimage.jpeg') }}" alt=""></div>
+  <div class="lp-overlay"></div>
+  <a href="{{ url_for('login') }}" class="back-link"><i class="fas fa-arrow-left"></i> All Portals</a>
+  <div class="brand">
+    <div class="brand-icon"><i class="fas fa-bone"></i></div>
+    <div>
+      <div class="brand-name">OsteoAI</div>
+      <span class="brand-sub">Patient Health Portal</span>
+    </div>
+  </div>
+  <div class="panel-title">Monitor Your<br>Bone Health</div>
+  <div class="panel-desc">Get AI-powered osteoporosis risk assessments, personalised meal plans, exercise guidance and much more.</div>
+  <div class="feature-list">
+    <div class="feature-item"><div class="fi-icon"><i class="fas fa-microscope"></i></div> AI Bone Risk Assessment</div>
+    <div class="feature-item"><div class="fi-icon"><i class="fas fa-apple-whole"></i></div> Personalised Nutrition Plans</div>
+    <div class="feature-item"><div class="fi-icon"><i class="fas fa-dumbbell"></i></div> Exercise Recommendations</div>
+    <div class="feature-item"><div class="fi-icon"><i class="fas fa-robot"></i></div> 24/7 AI Health Assistant</div>
+    <div class="feature-item"><div class="fi-icon"><i class="fas fa-file-pdf"></i></div> Downloadable PDF Reports</div>
+    <div class="feature-item"><div class="fi-icon"><i class="fas fa-map-location-dot"></i></div> Nearby Specialist Locator</div>
+  </div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+  <div class="form-card">
+
+    <div class="form-tabs">
+      <button class="form-tab active" id="tSI" onclick="switchTab('signin')"><i class="fas fa-right-to-bracket"></i> Sign In</button>
+      <button class="form-tab" id="tSU" onclick="switchTab('signup')"><i class="fas fa-user-plus"></i> Register</button>
+    </div>
+
+    {% if error %}
+    <div class="alert-error"><i class="fas fa-exclamation-circle"></i> {{ error }}</div>
+    {% endif %}
+
+    <!-- ── SIGN IN ── -->
+    <div id="fSI">
+      <div class="form-title">Welcome back</div>
+      <div class="form-subtitle">Sign in to your patient account</div>
+
+      <form method="POST" action="{{ url_for('patient_login') }}">
+        <input type="hidden" name="action" value="login">
+        <input type="hidden" name="user_role" value="patient">
+
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-envelope"></i> Email Address</label>
+          <input type="email" name="email" class="form-control" placeholder="your@email.com" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-lock"></i> Password</label>
+          <div class="pw-wrap">
+            <input type="password" name="password" id="siPwd" class="form-control" placeholder="Your password" required>
+            <button type="button" class="pw-toggle" onclick="togglePwd('siPwd','siEye')"><i class="fas fa-eye" id="siEye"></i></button>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary"><i class="fas fa-right-to-bracket"></i> Sign In as Patient</button>
+      </form>
+
+      <div class="divider">or</div>
+      <div style="text-align:center;font-size:.78rem;color:#6b7280;">Don't have an account? <a href="#" onclick="switchTab('signup');return false;" style="color:#1d4ed8;font-weight:700;">Register here</a></div>
+    </div>
+
+    <!-- ── REGISTER ── -->
+    <div id="fSU" style="display:none;">
+      <div class="form-title">Create account</div>
+      <div class="form-subtitle">Register as a new patient</div>
+
+      <form method="POST" action="{{ url_for('patient_login') }}">
+        <input type="hidden" name="action" value="signup">
+        <input type="hidden" name="user_role" value="patient">
+
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-user"></i> Full Name</label>
+          <input type="text" name="reg_name" class="form-control" placeholder="Your full name" autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-envelope"></i> Email Address</label>
+          <input type="email" name="email" class="form-control" placeholder="your@email.com" required autocomplete="email">
+        </div>
+        <div class="two-col">
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-venus-mars"></i> Gender</label>
+            <select name="reg_gender" class="form-select"><option>Female</option><option>Male</option><option>Other</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-cake-candles"></i> Age</label>
+            <input type="number" name="reg_age" class="form-control" placeholder="Age" min="18" max="120">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-tint"></i> Blood Group</label>
+          <select name="reg_blood_group" class="form-select">
+            <option value="">Select blood group</option>
+            <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+            <option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-lock"></i> Password</label>
+          <div class="pw-wrap">
+            <input type="password" name="password" id="suPwd" class="form-control" placeholder="Min. 6 characters" required>
+            <button type="button" class="pw-toggle" onclick="togglePwd('suPwd','suEye')"><i class="fas fa-eye" id="suEye"></i></button>
+          </div>
+          <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+          <div class="strength-label" id="strengthLabel"></div>
+        </div>
+        <button type="submit" class="btn-primary"><i class="fas fa-user-plus"></i> Create Patient Account</button>
+      </form>
+
+      <div class="divider">or</div>
+      <div style="text-align:center;font-size:.78rem;color:#6b7280;">Already have an account? <a href="#" onclick="switchTab('signin');return false;" style="color:#1d4ed8;font-weight:700;">Sign in</a></div>
+    </div>
+
+    <div style="display:flex;justify-content:center;gap:1rem;margin-top:1.4rem;flex-wrap:wrap;">
+      <span style="font-size:.7rem;color:#9ca3af;display:flex;align-items:center;gap:.3rem;"><i class="fas fa-shield-halved" style="color:#1d4ed8;"></i> Encrypted</span>
+      <span style="font-size:.7rem;color:#9ca3af;display:flex;align-items:center;gap:.3rem;"><i class="fas fa-lock" style="color:#1d4ed8;"></i> HIPAA Compliant</span>
+      <a href="{{ url_for('login') }}" style="font-size:.7rem;color:#9ca3af;display:flex;align-items:center;gap:.3rem;text-decoration:none;"><i class="fas fa-arrow-left"></i> All Portals</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(mode){
+  const si = mode==='signin';
+  document.getElementById('fSI').style.display = si?'':'none';
+  document.getElementById('fSU').style.display = si?'none':'';
+  document.getElementById('tSI').classList.toggle('active', si);
+  document.getElementById('tSU').classList.toggle('active', !si);
+}
+function togglePwd(id,iconId){
+  const inp=document.getElementById(id), ico=document.getElementById(iconId);
+  inp.type = inp.type==='password'?'text':'password';
+  ico.className = inp.type==='password'?'fas fa-eye':'fas fa-eye-slash';
+}
+document.getElementById('suPwd').addEventListener('input', function(){
+  const pw=this.value; let score=0;
+  if(pw.length>=6) score++; if(pw.length>=10) score++;
+  if(/[A-Z]/.test(pw)) score++; if(/[0-9]/.test(pw)) score++;
+  if(/[^A-Za-z0-9]/.test(pw)) score++;
+  const pct=(score/5)*100;
+  const colors=['#e53e3e','#f6b93b','#f6b93b','#06c270','#06c270'];
+  const labels=['','Weak','Fair','Good','Strong'];
+  document.getElementById('strengthFill').style.width=pct+'%';
+  document.getElementById('strengthFill').style.background=colors[Math.max(score-1,0)];
+  document.getElementById('strengthLabel').textContent=labels[score]||'';
+});
+if(window.location.search.includes('signup')) switchTab('signup');
+</script>
+</body>
+</html>

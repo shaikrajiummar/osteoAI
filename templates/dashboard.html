@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — OsteoAI{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<div class="hero-section">
+  <div class="hero-badge"><span class="status-dot status-online"></span> System Online — OsteoAI v2.5</div>
+  <div class="hero-title">
+    <i class="fas fa-house-medical"></i>
+    Welcome back, {{ (session.get('user_profile') or {}).get('name', (session.get('user') or {}).get('email','Clinician').split('@')[0]) }}
+  </div>
+  <div class="hero-subtitle">Clinical Osteoporosis Risk Assessment &amp; Patient Management System</div>
+</div>
+
+<!-- KPI Metrics -->
+<div class="metrics-grid">
+  <div class="metric-card">
+    <div class="metric-icon blue"><i class="fas fa-users"></i></div>
+    <div class="metric-body">
+      <div class="metric-label">Total Patients</div>
+      <div class="metric-value">{{ stats.total }}</div>
+      <div class="metric-sub metric-up"><i class="fas fa-arrow-up"></i> 12% vs last month</div>
+    </div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-icon red"><i class="fas fa-bone"></i></div>
+    <div class="metric-body">
+      <div class="metric-label">High Risk Cases</div>
+      <div class="metric-value">{{ stats.cases }}</div>
+      <div class="metric-sub metric-up"><i class="fas fa-arrow-down"></i> 5% vs last month</div>
+    </div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-icon green"><i class="fas fa-check-circle"></i></div>
+    <div class="metric-body">
+      <div class="metric-label">Model Accuracy</div>
+      <div class="metric-value">{{ stats.accuracy }}</div>
+      <div class="metric-sub text-muted">Validation Set</div>
+    </div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-icon amber"><i class="fas fa-procedures"></i></div>
+    <div class="metric-body">
+      <div class="metric-label">Active Sessions</div>
+      <div class="metric-value">{{ stats.active }}</div>
+      <div class="metric-sub metric-up"><i class="fas fa-arrow-up"></i> 24 Now</div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts + Quick Actions -->
+<div class="col-2-1 mb-4">
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-chart-pie" style="color:var(--primary);"></i>
+      <h2>Analytics Overview</h2>
+    </div>
+    <div class="card-body">
+      <div class="tabs" id="chartTabs">
+        <button class="tab-btn active" onclick="switchChartTab('riskTab',this)"><i class="fas fa-chart-pie"></i> Risk Distribution</button>
+        <button class="tab-btn" onclick="switchChartTab('trendTab',this)"><i class="fas fa-chart-line"></i> Monthly Trends</button>
+      </div>
+      <div id="riskTab"><div id="riskChart" style="height:300px;"></div></div>
+      <div id="trendTab" style="display:none;"><div id="trendChart" style="height:300px;"></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-bolt" style="color:var(--warning);"></i>
+      <h2>Quick Actions</h2>
+    </div>
+    <div class="card-body">
+      <a href="{{ url_for('assessment') }}" class="quick-action">
+        <i class="fas fa-microscope"></i> New Risk + X-Ray Analysis
+      </a>
+      <a href="{{ url_for('cloud_analytics') }}" class="quick-action">
+        <i class="fas fa-cloud-arrow-up"></i> Cloud Analytics
+      </a>
+      <a href="{{ url_for('health_history') }}" class="quick-action">
+        <i class="fas fa-file-medical"></i> View Health History
+      </a>
+      <a href="{{ url_for('ai_assistant') }}" class="quick-action">
+        <i class="fas fa-robot"></i> Ask Dr. Bone AI
+      </a>
+      <a href="{{ url_for('doctor_locator') }}" class="quick-action">
+        <i class="fas fa-hospital"></i> Find Specialists
+      </a>
+      <div style="margin-top:1rem;padding:.85rem 1rem;background:#f0fdf4;border-radius:10px;border:1px solid #86efac;font-size:.82rem;color:#15803d;display:flex;align-items:center;gap:.5rem;">
+        <span class="status-dot status-online"></span>
+        All services running — <strong>Online</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="card mb-4">
+  <div class="card-header">
+    <i class="fas fa-clock" style="color:var(--primary);"></i>
+    <h2>Recent Activity</h2>
+    <a href="{{ url_for('health_history') }}" class="btn btn-secondary" style="margin-left:auto;padding:.35rem .85rem;font-size:.78rem;">View All</a>
+  </div>
+  <div style="overflow-x:auto;">
+    <table class="data-table">
+      <thead><tr><th>Patient ID</th><th>Date</th><th>Risk Level</th><th>Confidence</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for r in recent %}
+        <tr>
+          <td><strong>{{ r.id }}</strong></td>
+          <td>{{ r.date }}</td>
+          <td><span class="badge badge-{{ r.risk.lower().replace(' ','') }}"><i class="fas fa-circle" style="font-size:.45rem;"></i> {{ r.risk }}</span></td>
+          <td>{{ r.confidence }}</td>
+          <td><a href="{{ url_for('assessment') }}" style="font-size:.8rem;color:var(--primary);text-decoration:none;font-weight:600;"><i class="fas fa-redo"></i> Reassess</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Disease Reference Gallery — uses actual images -->
+<div class="card mb-4">
+  <div class="card-header">
+    <i class="fas fa-images" style="color:var(--primary);"></i>
+    <h2>Disease Reference Gallery</h2>
+  </div>
+  <div class="card-body">
+    <p style="color:var(--text-muted);margin-bottom:1.25rem;font-size:.88rem;">
+      Visual comparison of bone density from normal to osteoporosis, with AI Grad-CAM heatmap analysis.
+    </p>
+    <div class="three-col">
+      <!-- Normal X-ray -->
+      <div class="gallery-card">
+        <img src="{{ url_for('static', filename='assets/temp_xray.png') }}" style="width:100%;height:200px;object-fit:cover;display:block;" alt="Normal knee X-ray">
+        <div class="gallery-label normal"><i class="fas fa-check-circle"></i> Normal Bone — Dense, Uniform</div>
+      </div>
+      <!-- Grad-CAM / Osteoporosis -->
+      <div class="gallery-card">
+        <img src="{{ url_for('static', filename='assets/temp_gradcam.png') }}" style="width:100%;height:200px;object-fit:cover;display:block;" alt="Grad-CAM Osteoporosis">
+        <div class="gallery-label osteoporosis"><i class="fas fa-fire"></i> Osteoporosis — Grad-CAM Heatmap</div>
+      </div>
+      <!-- Osteopenia X-ray comparison -->
+      <div class="gallery-card">
+        <img src="{{ url_for('static', filename='assets/feature_importance.png') }}" style="width:100%;height:200px;object-fit:cover;display:block;background:#fff;" alt="Risk Factor Feature Importance">
+        <div class="gallery-label osteopenia"><i class="fas fa-chart-bar"></i> AI Risk Factor Importance</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Model Performance -->
+<div class="card">
+  <div class="card-header">
+    <i class="fas fa-trophy" style="color:var(--warning);"></i>
+    <h2>Model Performance Overview</h2>
+  </div>
+  <div class="card-body">
+    <div id="modelPerfChart" style="height:280px;"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function switchChartTab(tabId, btn) {
+  document.querySelectorAll('#riskTab,#trendTab').forEach(t=>t.style.display='none');
+  document.querySelectorAll('#chartTabs .tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(tabId).style.display='';
+  btn.classList.add('active');
+  setTimeout(()=>window.dispatchEvent(new Event('resize')),50);
+}
+
+Plotly.newPlot('riskChart',[{
+  labels:['Normal','Osteopenia','Osteoporosis'],values:[450,300,150],
+  type:'pie',hole:.55,
+  marker:{colors:['#06c270','#f6b93b','#e53e3e']},
+  textinfo:'label+percent',
+  hovertemplate:'<b>%{label}</b><br>%{value} patients<br>%{percent}<extra></extra>'
+}],{margin:{t:10,b:10,l:10,r:10},paper_bgcolor:'transparent',plot_bgcolor:'transparent',
+  legend:{orientation:'h',y:-0.05},height:280},{displayModeBar:false,responsive:true});
+
+const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+Plotly.newPlot('trendChart',[{
+  x:months,y:[22,28,35,31,42,38,45,40,48,55,50,58],
+  type:'scatter',mode:'lines+markers',fill:'tozeroy',
+  line:{color:'#1a6fc4',width:3},marker:{color:'#1a6fc4',size:7},
+  fillcolor:'rgba(26,111,196,0.1)'
+}],{margin:{t:10,b:30,l:40,r:10},paper_bgcolor:'transparent',
+  plot_bgcolor:'transparent',xaxis:{showgrid:false},yaxis:{gridcolor:'#f0f4f8'},height:280},
+  {displayModeBar:false,responsive:true});
+
+Plotly.newPlot('modelPerfChart',[{
+  x:['Random Forest','SVM','KNN','Logistic Reg','Neural Net','Best Model'],
+  y:[94.2,91.8,88.5,89.3,93.1,94.8],
+  type:'bar',
+  marker:{color:['#4a9fd4','#7c3aed','#f6b93b','#06c270','#e53e3e','#1a6fc4'],
+    line:{color:'white',width:1}},
+  text:['94.2%','91.8%','88.5%','89.3%','93.1%','94.8%'],
+  textposition:'outside',hovertemplate:'<b>%{x}</b><br>Accuracy: %{y}%<extra></extra>'
+}],{margin:{t:30,b:80,l:50,r:20},paper_bgcolor:'transparent',plot_bgcolor:'transparent',
+  yaxis:{range:[80,100],gridcolor:'#f0f4f8',title:'Accuracy (%)'},
+  xaxis:{tickangle:-15},height:260},{displayModeBar:false,responsive:true});
+</script>
+{% endblock %}

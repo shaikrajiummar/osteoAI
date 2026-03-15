@@ -1,0 +1,14 @@
+{
+  "profile": {
+    "name": "raju",
+    "age": 30,
+    "gender": "Female",
+    "phone": "",
+    "blood_type": "O+",
+    "role": "doctor",
+    "specialty": "General Medicine",
+    "hospital": "12",
+    "license": "12"
+  },
+  "history": []
+}

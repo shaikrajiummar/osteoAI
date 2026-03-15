@@ -1,0 +1,178 @@
+{
+  "profile": {
+    "name": "SHAIK RAJIUMMAR",
+    "age": 30,
+    "gender": "Male",
+    "phone": "",
+    "blood_type": "B-",
+    "role": "patient",
+    "specialty": "",
+    "hospital": "",
+    "license": ""
+  },
+  "history": [
+    {
+      "timestamp": "2026-03-07 21:41",
+      "patient_name": "SHAIK RAJIUMMAR",
+      "prediction": "Normal",
+      "confidence": 90.0,
+      "age": 39,
+      "gender": "Female",
+      "bmi": 25.7,
+      "t_score": -1.0,
+      "z_score": 0.4,
+      "analysis_mode": "X-Ray Uploaded (Tabular)",
+      "risk_factors": [
+        [
+          "Smoker",
+          "fas fa-smoking",
+          "danger"
+        ],
+        [
+          "Low T-Score",
+          "fas fa-chart-line",
+          "warning"
+        ]
+      ],
+      "has_xray": true,
+      "xray_file": "xray_20260307_214119_832701.jpeg",
+      "gradcam_file": "gradcam_20260307_214119_832701.png"
+    },
+    {
+      "timestamp": "2026-03-11 12:05",
+      "patient_name": "SHAIK RAJIUMMAR",
+      "prediction": "Osteopenia",
+      "confidence": 78.0,
+      "age": 50,
+      "gender": "Female",
+      "bmi": 25.7,
+      "t_score": -1.0,
+      "z_score": -0.5,
+      "analysis_mode": "T-Score Rule-Based",
+      "risk_factors": [
+        [
+          "Family History",
+          "fas fa-people-group",
+          "warning"
+        ],
+        [
+          "Arthritis",
+          "fas fa-joint",
+          "warning"
+        ],
+        [
+          "Low T-Score",
+          "fas fa-chart-line",
+          "warning"
+        ]
+      ],
+      "has_xray": false,
+      "xray_file": "",
+      "gradcam_file": ""
+    },
+    {
+      "timestamp": "2026-03-11 12:05",
+      "patient_name": "SHAIK RAJIUMMAR",
+      "prediction": "Normal",
+      "confidence": 90.0,
+      "age": 50,
+      "gender": "Female",
+      "bmi": 25.7,
+      "t_score": 2.8,
+      "z_score": 0.6,
+      "analysis_mode": "X-Ray Uploaded (Tabular)",
+      "risk_factors": [],
+      "has_xray": true,
+      "xray_file": "xray_20260311_120512_192050.jpg",
+      "gradcam_file": "gradcam_20260311_120512_192050.png"
+    },
+    {
+      "timestamp": "2026-03-11 12:05",
+      "patient_name": "SHAIK RAJIUMMAR",
+      "prediction": "Osteopenia",
+      "confidence": 78.0,
+      "age": 50,
+      "gender": "Female",
+      "bmi": 25.7,
+      "t_score": -1.0,
+      "z_score": -0.5,
+      "analysis_mode": "T-Score Rule-Based",
+      "risk_factors": [
+        [
+          "Low T-Score",
+          "fas fa-chart-line",
+          "warning"
+        ]
+      ],
+      "has_xray": false,
+      "xray_file": "",
+      "gradcam_file": ""
+    },
+    {
+      "timestamp": "2026-03-11 12:06",
+      "patient_name": "SHAIK RAJIUMMAR",
+      "prediction": "Osteopenia",
+      "confidence": 78.0,
+      "age": 50,
+      "gender": "Female",
+      "bmi": 25.7,
+      "t_score": -1.0,
+      "z_score": -0.5,
+      "analysis_mode": "T-Score Rule-Based",
+      "risk_factors": [
+        [
+          "Low T-Score",
+          "fas fa-chart-line",
+          "warning"
+        ]
+      ],
+      "has_xray": false,
+      "xray_file": "",
+      "gradcam_file": ""
+    },
+    {
+      "timestamp": "2026-03-13 15:13",
+      "patient_name": "SHAIK RAJIUMMAR",
+      "prediction": "Osteopenia",
+      "confidence": 78.0,
+      "age": 50,
+      "gender": "Female",
+      "bmi": 25.7,
+      "t_score": -1.0,
+      "z_score": -0.5,
+      "analysis_mode": "T-Score Rule-Based",
+      "risk_factors": [
+        [
+          "Low T-Score",
+          "fas fa-chart-line",
+          "warning"
+        ]
+      ],
+      "has_xray": false,
+      "xray_file": "",
+      "gradcam_file": ""
+    },
+    {
+      "timestamp": "2026-03-13 15:13",
+      "patient_name": "SHAIK RAJIUMMAR",
+      "prediction": "Normal",
+      "confidence": 90.0,
+      "age": 50,
+      "gender": "Female",
+      "bmi": 25.7,
+      "t_score": -1.0,
+      "z_score": -0.5,
+      "analysis_mode": "X-Ray Uploaded (Tabular)",
+      "risk_factors": [
+        [
+          "Low T-Score",
+          "fas fa-chart-line",
+          "warning"
+        ]
+      ],
+      "has_xray": true,
+      "xray_file": "xray_20260313_151344_602555.jpg",
+      "gradcam_file": "gradcam_20260313_151344_602555.png"
+    }
+  ]
+}

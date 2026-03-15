@@ -1,0 +1,2416 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Doctor Portal — OsteoAI</title>
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
+    <style>
+/* ═══════════════════════════════════════════════════════════════════════════════
+   OSTEOAI  ·  DOCTOR PORTAL  ·  PROFESSIONAL MEDICAL DESIGN SYSTEM
+   Typeface: Inter + JetBrains Mono  |  Palette: Clinical Navy × Pure White
+═══════════════════════════════════════════════════════════════════════════════ */
+:root{
+  --navy:  #0B1D3A;  --navy2: #122347;  --navy3: #1a3260;
+  --blue:  #1C6EF2;  --blue2: #1557CA;  --blue-lt:#EBF3FF;
+  --teal:  #0A9870;  --teal-lt:#E6F7F2;
+  --red:   #D93025;  --red-lt: #FEF0EE;  --red-dk:#A82018;
+  --amber: #C97E0A;  --amber-lt:#FFF8E6;
+  --green: #0D8A52;  --green-lt:#E8F8F0;
+  --purple:#6B3FA0;  --purple-lt:#F3EDFF;
+  --bg:    #F0F4FA;
+  --surface:#FFFFFF;
+  --border:#DDE4F0;
+  --border2:#C8D3E8;
+  --text:  #0F1923;
+  --muted: #5A6880;
+  --sub:   #8A98B0;
+  --r:     10px;  --r2:14px;
+  --sh:    0 1px 3px rgba(11,29,58,.06),0 4px 16px rgba(11,29,58,.06);
+  --sh2:   0 8px 32px rgba(11,29,58,.13);
+  font-family:'Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-size:14px}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── Shell ── */
+.shell{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SIDEBAR
+───────────────────────────────────────────────────────────────────────────── */
+.sidebar{
+  background:linear-gradient(180deg,var(--navy) 0%,var(--navy2) 60%,var(--navy3) 100%);
+  display:flex;flex-direction:column;
+  border-right:1px solid rgba(255,255,255,.06);
+  position:sticky;top:0;height:100vh;overflow-y:auto
+}
+.sb-logo{
+  padding:1.5rem 1.25rem 1.1rem;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  display:flex;align-items:center;gap:.75rem
+}
+.sb-logo-icon{
+  width:38px;height:38px;border-radius:10px;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;color:#fff;flex-shrink:0;
+  box-shadow:0 4px 12px rgba(28,110,242,.35)
+}
+.sb-logo-text{font-size:1.05rem;font-weight:800;color:#fff;letter-spacing:-.3px}
+.sb-logo-sub{font-size:.65rem;color:rgba(255,255,255,.38);margin-top:.1rem}
+
+.sb-doc{
+  padding:.95rem 1.25rem;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  display:flex;align-items:center;gap:.75rem
+}
+.sb-avatar{
+  width:42px;height:42px;border-radius:12px;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(28,110,242,.6),rgba(10,152,112,.5));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;font-weight:800;color:#fff;
+  border:1.5px solid rgba(255,255,255,.12)
+}
+.sb-doc-name{font-size:.84rem;font-weight:700;color:#fff;line-height:1.3}
+.sb-doc-spec{font-size:.7rem;color:rgba(255,255,255,.42);margin-top:.1rem}
+.sb-online{
+  display:inline-flex;align-items:center;gap:.3rem;
+  font-size:.65rem;font-weight:700;color:#34d399;margin-top:.35rem
+}
+.sb-online::before{content:'';width:6px;height:6px;border-radius:50%;background:#34d399}
+
+.sb-nav{flex:1;padding:.75rem .65rem}
+.sb-grp{font-size:.62rem;font-weight:700;color:rgba(255,255,255,.25);
+  text-transform:uppercase;letter-spacing:1.3px;padding:.6rem .65rem .3rem}
+.sb-link{
+  display:flex;align-items:center;gap:.65rem;
+  padding:.58rem .75rem;border-radius:9px;cursor:pointer;
+  font-size:.82rem;font-weight:500;color:rgba(255,255,255,.52);
+  transition:all .17s;margin-bottom:.06rem;border:none;background:none;width:100%
+}
+.sb-link:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.9)}
+.sb-link.active{
+  background:rgba(28,110,242,.28);color:#fff;font-weight:700;
+  border:1px solid rgba(28,110,242,.4)
+}
+.sb-link i{width:17px;text-align:center;font-size:.85rem}
+.sb-badge{
+  margin-left:auto;background:#D93025;color:#fff;
+  border-radius:20px;font-size:.62rem;font-weight:800;
+  padding:.08rem .42rem;min-width:17px;text-align:center
+}
+.sb-foot{
+  padding:.85rem 1.25rem;border-top:1px solid rgba(255,255,255,.07)
+}
+.sb-foot a{
+  display:flex;align-items:center;gap:.55rem;
+  font-size:.78rem;color:rgba(255,255,255,.35);
+  padding:.3rem 0;transition:color .17s
+}
+.sb-foot a:hover{color:rgba(255,255,255,.7)}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MAIN
+───────────────────────────────────────────────────────────────────────────── */
+.main{display:flex;flex-direction:column;min-width:0;overflow:hidden}
+
+/* Top bar */
+.topbar{
+  background:var(--surface);border-bottom:1.5px solid var(--border);
+  padding:.85rem 1.75rem;display:flex;align-items:center;gap:1rem;
+  position:sticky;top:0;z-index:40;
+  box-shadow:0 1px 4px rgba(11,29,58,.04)
+}
+.topbar-title{font-size:1rem;font-weight:800;color:var(--text);letter-spacing:-.25px}
+.topbar-sub{font-size:.72rem;color:var(--muted);margin-top:.08rem}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:.7rem}
+#liveClock{
+  font-family:'JetBrains Mono',monospace;font-size:.78rem;
+  color:var(--muted);background:var(--bg);
+  border:1.5px solid var(--border);border-radius:8px;
+  padding:.28rem .7rem
+}
+
+/* View tabs */
+.vtabs{
+  display:flex;gap:.3rem;background:var(--surface);
+  border:1.5px solid var(--border);border-radius:var(--r);
+  padding:.3rem;margin:1.25rem 1.75rem .75rem;flex-wrap:wrap
+}
+.vtab{
+  padding:.45rem 1rem;border-radius:8px;cursor:pointer;
+  font-size:.8rem;font-weight:600;color:var(--muted);
+  transition:all .17s;border:none;background:none
+}
+.vtab:hover{color:var(--text);background:var(--bg)}
+.vtab.active{
+  background:var(--blue);color:#fff;
+  box-shadow:0 2px 10px rgba(28,110,242,.3)
+}
+
+.content{padding:0 1.75rem 2rem;display:flex;flex-direction:column;gap:1.2rem}
+
+/* ── KPI Grid ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.kpi{
+  background:var(--surface);border-radius:var(--r2);
+  border:1.5px solid var(--border);
+  padding:1.15rem 1.25rem;
+  box-shadow:var(--sh);
+  transition:all .2s;cursor:default;position:relative;overflow:hidden
+}
+.kpi:hover{transform:translateY(-2px);box-shadow:var(--sh2)}
+.kpi-glow{
+  position:absolute;right:-16px;top:-16px;
+  width:72px;height:72px;border-radius:50%;opacity:.07
+}
+.kpi.blue .kpi-glow{background:var(--blue)}
+.kpi.red  .kpi-glow{background:var(--red)}
+.kpi.amber.kpi-glow{background:var(--amber)}
+.kpi.green .kpi-glow{background:var(--green)}
+.kpi-icon{
+  width:40px;height:40px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.95rem;margin-bottom:.85rem
+}
+.kpi.blue  .kpi-icon{background:var(--blue-lt); color:var(--blue)}
+.kpi.red   .kpi-icon{background:var(--red-lt);  color:var(--red)}
+.kpi.amber .kpi-icon{background:var(--amber-lt);color:var(--amber)}
+.kpi.green .kpi-icon{background:var(--green-lt);color:var(--green)}
+.kpi-num{
+  font-size:2rem;font-weight:800;line-height:1;
+  font-family:'JetBrains Mono',monospace;letter-spacing:-1px
+}
+.kpi-lbl{font-size:.72rem;color:var(--muted);font-weight:600;margin-top:.3rem}
+.kpi-chip{
+  display:inline-flex;align-items:center;gap:.2rem;
+  font-size:.66rem;font-weight:700;margin-top:.5rem;
+  padding:.16rem .45rem;border-radius:5px
+}
+.chip-up{background:var(--green-lt);color:var(--green)}
+.chip-neu{background:var(--bg);color:var(--muted)}
+.chip-dn{background:var(--red-lt);color:var(--red)}
+
+/* ── Card ── */
+.card{
+  background:var(--surface);border-radius:var(--r2);
+  border:1.5px solid var(--border);box-shadow:var(--sh);overflow:hidden
+}
+.card-hd{
+  display:flex;align-items:center;gap:.6rem;
+  padding:.9rem 1.2rem;border-bottom:1px solid var(--border)
+}
+.card-hd h3{font-size:.88rem;font-weight:700;flex:1;letter-spacing:-.2px}
+.card-hd .hd-badge{
+  font-size:.65rem;font-weight:700;padding:.16rem .5rem;border-radius:5px
+}
+.hd-badge.live{background:var(--teal-lt);color:var(--teal)}
+.hd-badge.blue{background:var(--blue-lt);color:var(--blue)}
+.card-body{padding:1.1rem 1.2rem}
+
+/* Row layouts */
+.row2{display:grid;grid-template-columns:1fr 320px;gap:1.2rem}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.2rem}
+
+/* ── Patient table ── */
+.pt-tbl{width:100%;border-collapse:collapse;font-size:.8rem}
+.pt-tbl thead th{
+  background:var(--bg);font-size:.68rem;font-weight:700;
+  color:var(--muted);text-transform:uppercase;letter-spacing:.5px;
+  padding:.6rem .9rem;border-bottom:1.5px solid var(--border);
+  text-align:left;white-space:nowrap
+}
+.pt-tbl tbody tr{border-bottom:1px solid var(--border);transition:background .14s;cursor:pointer}
+.pt-tbl tbody tr:hover{background:#F5F8FF}
+.pt-tbl tbody td{padding:.68rem .9rem;vertical-align:middle}
+.pt-tbl tfoot td{
+  padding:.6rem .9rem;border-top:1.5px solid var(--border);
+  font-size:.72rem;color:var(--muted);background:var(--bg)
+}
+
+/* Risk badges */
+.rb{
+  display:inline-flex;align-items:center;gap:.28rem;
+  padding:.2rem .62rem;border-radius:6px;font-size:.72rem;font-weight:700
+}
+.rb.osteoporosis{background:#FEE2E2;color:#7F1D1D}
+.rb.osteopenia{background:#FEF3C7;color:#78350F}
+.rb.normal{background:#D1FAE5;color:#064E3B}
+
+/* Confidence mini */
+.cf{display:inline-flex;align-items:center;gap:.4rem;font-family:'JetBrains Mono',monospace;font-size:.77rem}
+.cf-bar{width:44px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.cf-fill{height:100%;border-radius:2px}
+
+/* Action buttons */
+.ab{
+  display:inline-flex;align-items:center;gap:.25rem;
+  padding:.26rem .58rem;border-radius:7px;font-size:.7rem;font-weight:700;
+  border:1.5px solid;cursor:pointer;transition:all .14s;background:none
+}
+.ab:hover{transform:translateY(-1px)}
+.ab.view{border-color:var(--blue);color:var(--blue)}
+.ab.view:hover{background:var(--blue);color:#fff}
+.ab.note{border-color:var(--teal);color:var(--teal)}
+.ab.note:hover{background:var(--teal);color:#fff}
+.ab.rx{border-color:var(--amber);color:var(--amber)}
+.ab.rx:hover{background:var(--amber);color:#fff}
+.ab.pdf{border-color:var(--red);color:var(--red)}
+.ab.pdf:hover{background:var(--red);color:#fff}
+.ab.msg{border-color:var(--purple);color:var(--purple)}
+.ab.msg:hover{background:var(--purple);color:#fff}
+
+/* Filter bar */
+.filter-row{
+  display:flex;gap:.6rem;align-items:center;
+  padding:.85rem 1.2rem;flex-wrap:wrap;
+  background:var(--bg);border-bottom:1.5px solid var(--border)
+}
+.fi{
+  border:1.5px solid var(--border);border-radius:var(--r);
+  padding:.42rem .8rem;font-size:.8rem;
+  background:var(--surface);color:var(--text);outline:none;
+  transition:border-color .17s;font-family:'Inter',sans-serif
+}
+.fi:focus{border-color:var(--blue)}
+.fi-count{font-size:.75rem;color:var(--muted);margin-left:auto;font-family:'JetBrains Mono',monospace}
+
+/* Alert items */
+.al-item{
+  display:flex;align-items:center;gap:.7rem;
+  padding:.65rem .85rem;border-radius:9px;border:1px solid;
+  margin-bottom:.45rem;transition:all .16s;cursor:pointer
+}
+.al-item:hover{transform:translateX(2px)}
+.al-item.danger{background:#FEF2F2;border-color:#FECACA}
+.al-item.warning{background:#FFFBEB;border-color:#FDE68A}
+.al-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.al-dot.danger{background:var(--red)}
+.al-dot.warning{background:var(--amber)}
+.al-name{font-size:.8rem;font-weight:700;color:var(--text)}
+.al-sub{font-size:.68rem;color:var(--muted)}
+.al-ts{
+  font-family:'JetBrains Mono',monospace;font-size:.72rem;
+  font-weight:700;margin-left:auto
+}
+.al-ts.danger{color:var(--red)}
+.al-ts.warning{color:var(--amber)}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SLIDE PANELS
+───────────────────────────────────────────────────────────────────────────── */
+.overlay{
+  position:fixed;inset:0;background:rgba(11,29,58,.4);
+  z-index:900;display:none;backdrop-filter:blur(2px)
+}
+.overlay.open{display:block}
+.panel{
+  position:fixed;right:0;top:0;bottom:0;width:420px;
+  background:var(--surface);z-index:901;
+  border-left:1.5px solid var(--border);
+  box-shadow:-10px 0 50px rgba(11,29,58,.18);
+  transform:translateX(100%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column
+}
+.panel.open{transform:translateX(0)}
+.panel-hd{
+  display:flex;align-items:center;gap:.65rem;
+  padding:1.05rem 1.3rem;flex-shrink:0;
+  border-bottom:1px solid var(--border)
+}
+.panel-hd h3{margin:0;font-size:.92rem;font-weight:800;flex:1}
+.panel-x{
+  background:none;border:none;color:var(--muted);
+  cursor:pointer;font-size:1rem;padding:.25rem;border-radius:6px;
+  transition:all .15s
+}
+.panel-x:hover{background:var(--bg);color:var(--text)}
+.panel-body{flex:1;overflow-y:auto;padding:1.2rem 1.3rem}
+
+/* Patient detail panel */
+.det-stat{
+  background:var(--bg);border-radius:var(--r);
+  border:1px solid var(--border);padding:.65rem .85rem
+}
+.det-lbl{font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.det-val{font-size:1.05rem;font-weight:800;color:var(--text);margin-top:.12rem;font-family:'JetBrains Mono',monospace}
+
+/* Timeline */
+.tl{display:flex;flex-direction:column;gap:0}
+.tl-item{display:flex;gap:.8rem;position:relative;padding-bottom:.9rem}
+.tl-item:not(:last-child)::before{
+  content:'';position:absolute;left:12px;top:26px;
+  width:1.5px;bottom:0;background:var(--border)
+}
+.tl-dot{
+  width:25px;height:25px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;font-weight:800;border:2px solid
+}
+.tl-dot.osteoporosis{background:#FEE2E2;border-color:var(--red);color:var(--red)}
+.tl-dot.osteopenia{background:#FEF3C7;border-color:var(--amber);color:var(--amber)}
+.tl-dot.normal{background:#D1FAE5;border-color:var(--green);color:var(--green)}
+.tl-date{font-size:.67rem;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.tl-title{font-size:.8rem;font-weight:700;margin-top:.07rem}
+.tl-sub{font-size:.7rem;color:var(--muted);margin-top:.05rem}
+
+/* Notes */
+.note-area{
+  width:100%;border:1.5px solid var(--border);border-radius:var(--r);
+  padding:.7rem;font-size:.82rem;resize:vertical;min-height:110px;
+  font-family:'Inter',sans-serif;outline:none;
+  transition:border-color .17s;line-height:1.6
+}
+.note-area:focus{border-color:var(--blue)}
+.note-saved{
+  background:var(--bg);border:1px solid var(--border);border-radius:9px;
+  padding:.6rem .8rem;margin-bottom:.4rem
+}
+.note-saved-time{font-size:.67rem;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.note-saved-txt{font-size:.8rem;margin-top:.22rem;line-height:1.55}
+
+/* Prescriptions */
+.drug-btn{
+  display:inline-flex;align-items:center;gap:.3rem;
+  padding:.28rem .65rem;border-radius:7px;font-size:.72rem;font-weight:700;
+  background:var(--blue-lt);color:var(--blue);
+  border:1px solid rgba(28,110,242,.2);
+  cursor:pointer;margin:.18rem;transition:all .14s
+}
+.drug-btn:hover{background:var(--blue);color:#fff}
+.rx-item{
+  display:flex;align-items:flex-start;gap:.55rem;
+  padding:.55rem .8rem;background:var(--bg);
+  border:1px solid var(--border);border-radius:9px;margin-bottom:.4rem
+}
+.rx-rm{background:none;border:none;color:var(--red);cursor:pointer;margin-left:auto;font-size:.8rem}
+
+/* Performance metrics */
+.perf-bar-row{margin-bottom:.85rem}
+.perf-bar-lbl{
+  display:flex;justify-content:space-between;
+  font-size:.75rem;font-weight:600;margin-bottom:.3rem
+}
+.perf-bar-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.perf-bar-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+
+/* Score ring */
+.score-ring{
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:.15rem;
+  padding:1.1rem;background:var(--bg);
+  border:1px solid var(--border);border-radius:var(--r2);
+  position:relative;overflow:hidden
+}
+.score-ring::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--blue-lt),transparent 60%);
+  opacity:.4
+}
+.score-num{font-size:2.4rem;font-weight:800;font-family:'JetBrains Mono',monospace;position:relative}
+.score-lbl{font-size:.7rem;color:var(--muted);font-weight:600;position:relative;text-align:center}
+
+/* Section dividers */
+.sec-title{
+  font-size:.75rem;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.5px;
+  margin:.85rem 0 .45rem;padding:.3rem 0;
+  border-bottom:1px solid var(--border)
+}
+
+/* ── Responsive ── */
+@media(max-width:1200px){.row2{grid-template-columns:1fr}.kpi-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.shell{grid-template-columns:1fr}.sidebar{display:none}}
+@media(max-width:600px){.kpi-grid{grid-template-columns:1fr 1fr}.panel{width:100%}}
+
+/* ── Print prescription ── */
+@media print{.sidebar,.topbar,.vtabs,.filter-row,.panel,button,.ab{display:none!important}.main{padding:0}}
+
+/* ══════════════════════════════════════════════════════════════════
+   NEW ENHANCED FEATURES CSS
+══════════════════════════════════════════════════════════════════ */
+
+/* ── Patient Card Grid (Patient Tracking view) ── */
+.pt-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;padding:1.1rem}
+.pt-card{
+  border:1.5px solid var(--border);border-radius:var(--r2);
+  background:var(--surface);padding:1rem 1.1rem;
+  transition:all .2s;cursor:pointer;position:relative;overflow:hidden
+}
+.pt-card:hover{border-color:var(--blue);box-shadow:0 4px 20px rgba(28,110,242,.12);transform:translateY(-2px)}
+.pt-card-top{display:flex;align-items:center;gap:.75rem;margin-bottom:.65rem}
+.pt-avatar{width:42px;height:42px;border-radius:12px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;font-weight:800;color:#fff}
+.pt-avatar.osteoporosis{background:linear-gradient(135deg,var(--red),var(--red-dk))}
+.pt-avatar.osteopenia{background:linear-gradient(135deg,var(--amber),#B45309)}
+.pt-avatar.normal{background:linear-gradient(135deg,var(--green),#065F46)}
+.pt-card-name{font-size:.88rem;font-weight:800;color:var(--text)}
+.pt-card-sub{font-size:.7rem;color:var(--muted);margin-top:.05rem}
+.pt-card-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.4rem}
+.pt-stat{background:var(--bg);border-radius:8px;padding:.35rem .5rem;text-align:center}
+.pt-stat-v{font-size:.85rem;font-weight:800;font-family:'JetBrains Mono',monospace}
+.pt-stat-l{font-size:.6rem;color:var(--muted);font-weight:600;margin-top:.05rem}
+.pt-card-foot{display:flex;align-items:center;gap:.4rem;margin-top:.7rem;padding-top:.65rem;border-top:1px solid var(--border)}
+.follow-badge{
+  display:inline-flex;align-items:center;gap:.25rem;
+  font-size:.65rem;font-weight:700;padding:.15rem .45rem;
+  border-radius:5px;border:1px solid
+}
+.follow-badge.overdue{background:#FEE2E2;border-color:#FECACA;color:var(--red)}
+.follow-badge.soon{background:#FEF3C7;border-color:#FDE68A;color:var(--amber)}
+.follow-badge.ok{background:#D1FAE5;border-color:#A7F3D0;color:var(--green)}
+.follow-badge.new{background:var(--blue-lt);border-color:#BFDBFE;color:var(--blue)}
+.pt-actions{display:flex;gap:.3rem;margin-left:auto}
+
+/* ── Follow-up scheduler ── */
+.appt-item{
+  display:flex;align-items:center;gap:.8rem;
+  padding:.65rem .9rem;border:1px solid var(--border);
+  border-radius:9px;margin-bottom:.4rem;background:var(--surface)
+}
+.appt-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.appt-dot.scheduled{background:var(--blue)}
+.appt-dot.urgent{background:var(--red)}
+.appt-dot.completed{background:var(--green)}
+.appt-name{font-size:.8rem;font-weight:700}
+.appt-date{font-size:.7rem;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.appt-rm{background:none;border:none;color:var(--muted);cursor:pointer;margin-left:auto;font-size:.8rem;transition:color .15s}
+.appt-rm:hover{color:var(--red)}
+
+/* ── Performance Goals / Target bars ── */
+.goal-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:.8rem .9rem;margin-bottom:.6rem}
+.goal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
+.goal-lbl{font-size:.78rem;font-weight:700}
+.goal-pct{font-size:.78rem;font-weight:800;font-family:'JetBrains Mono',monospace}
+.goal-track{height:10px;background:var(--border);border-radius:5px;overflow:hidden}
+.goal-fill{height:100%;border-radius:5px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.goal-note{font-size:.67rem;color:var(--muted);margin-top:.3rem}
+
+/* ── Weekly workload heat calendar ── */
+.heat-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:.5rem}
+.heat-day{
+  aspect-ratio:1;border-radius:4px;cursor:default;
+  transition:transform .14s;display:flex;align-items:center;justify-content:center;
+  font-size:.6rem;font-weight:700;color:#fff
+}
+.heat-day:hover{transform:scale(1.12)}
+.heat-day.l0{background:var(--border)}
+.heat-day.l1{background:rgba(28,110,242,.3)}
+.heat-day.l2{background:rgba(28,110,242,.55)}
+.heat-day.l3{background:rgba(28,110,242,.8)}
+.heat-day.l4{background:var(--blue)}
+.heat-lbl{font-size:.65rem;color:var(--muted);text-align:center;margin-top:.2rem}
+
+/* ── Message/Notification inbox ── */
+.msg-item{
+  display:flex;align-items:flex-start;gap:.7rem;
+  padding:.7rem .9rem;border-bottom:1px solid var(--border);
+  transition:background .14s;cursor:pointer
+}
+.msg-item:hover{background:var(--bg)}
+.msg-item.unread{border-left:3px solid var(--blue);background:#F0F7FF}
+.msg-avatar{width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800}
+.msg-name{font-size:.8rem;font-weight:700}
+.msg-preview{font-size:.72rem;color:var(--muted);margin-top:.1rem;line-height:1.4;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
+.msg-time{font-size:.67rem;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-left:auto;white-space:nowrap}
+.msg-unread-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:.3rem}
+
+/* ── Intake form widget ── */
+.intake-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem}
+.intake-lbl{font-size:.75rem;font-weight:700;color:var(--muted);min-width:90px}
+.intake-val{flex:1;padding:.38rem .7rem;border:1.5px solid var(--border);border-radius:8px;
+  font-size:.8rem;font-family:'Inter',sans-serif;outline:none;background:var(--surface);color:var(--text);transition:border-color .17s}
+.intake-val:focus{border-color:var(--blue)}
+
+/* ── Toast notification (doctor portal) ── */
+#docToastZone{position:fixed;top:1rem;left:50%;transform:translateX(-50%);z-index:9999;
+  display:flex;flex-direction:column;gap:.4rem;pointer-events:none}
+.doc-toast{
+  display:flex;align-items:center;gap:.55rem;padding:.6rem 1rem;
+  border-radius:10px;font-size:.79rem;font-weight:600;
+  box-shadow:0 4px 18px rgba(11,29,58,.18);pointer-events:all;min-width:250px;
+  animation:dtIn .3s cubic-bezier(.34,1.56,.64,1) both;border-left:3px solid
+}
+.doc-toast.info{background:#fff;border-color:var(--blue);color:var(--text)}
+.doc-toast.success{background:#F0FDF4;border-color:var(--green);color:#065F46}
+.doc-toast.warn{background:#FFFBEB;border-color:var(--amber);color:#78350F}
+.doc-toast.danger{background:#FEF2F2;border-color:var(--red);color:#7F1D1D}
+@keyframes dtIn{from{opacity:0;transform:translateY(-10px) scale(.93)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes dtOut{to{opacity:0;transform:translateY(-6px) scale(.94)}}
+.doc-toast.removing{animation:dtOut .22s ease forwards}
+
+</style>
+  </head>
+  <body>
+    <div class="shell">
+
+      <!-- ═══════════════════════════════════════════════════════ SIDEBAR -->
+      <nav class="sidebar">
+        <div class="sb-logo">
+          <div class="sb-logo-icon"><i class="fas fa-bone"></i></div>
+          <div>
+            <div class="sb-logo-text">OsteoAI</div>
+            <div class="sb-logo-sub">Clinical Management System</div>
+          </div>
+        </div>
+        <div class="sb-doc">
+          <div class="sb-avatar" id="sbAvatar">D</div>
+          <div>
+            <div class="sb-doc-name">Dr. {{ doc_profile.get('name','Physician')
+              }}</div>
+            <div class="sb-doc-spec">{{
+              doc_profile.get('specialty','General Practitioner') }}</div>
+            <div class="sb-online">Active</div>
+          </div>
+        </div>
+        <div class="sb-nav">
+          <div class="sb-grp">Overview</div>
+          <button class="sb-link active" onclick="showView('dashboard',this)">
+            <i class="fas fa-gauge-high"></i> Dashboard
+          </button>
+          <button class="sb-link" onclick="showView('patients',this)">
+            <i class="fas fa-users"></i> All Patients
+            <span class="sb-badge" id="ptBadge">0</span>
+          </button>
+          <button class="sb-link" onclick="showView('alerts',this)">
+            <i class="fas fa-triangle-exclamation"></i> Alerts
+            <span class="sb-badge" id="alBadge">0</span>
+          </button>
+
+          <div class="sb-grp" style="margin-top:.55rem">Clinical Tools</div>
+          <button class="sb-link" onclick="showView('performance',this)">
+            <i class="fas fa-chart-line"></i> My Performance
+          </button>
+          <button class="sb-link" onclick="showView('tracking',this)">
+            <i class="fas fa-address-card"></i> Patient Tracking
+            <span class="sb-badge" id="followBadge"
+              style="background:var(--amber);display:none">!</span>
+          </button>
+          <button class="sb-link" onclick="showView('appointments',this)">
+            <i class="fas fa-calendar-check"></i> Appointments
+          </button>
+          <button class="sb-link" onclick="showView('inbox',this)">
+            <i class="fas fa-inbox"></i> Inbox
+            <span class="sb-badge" id="inboxBadge">3</span>
+          </button>
+          <button class="sb-link" onclick="showView('analytics',this)">
+            <i class="fas fa-chart-pie"></i> Analytics
+          </button>
+          <button class="sb-link" onclick="openPanel('rxPanel')">
+            <i class="fas fa-prescription-bottle-medical"></i> Prescriptions
+          </button>
+
+        </div>
+        <div class="sb-foot">
+          <a href="{{ url_for('logout') }}"><i
+              class="fas fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+      </nav>
+
+      <!-- ═══════════════════════════════════════════════════════ MAIN -->
+      <div class="main">
+
+        <!-- Top bar -->
+        <div class="topbar">
+          <div>
+            <div class="topbar-title" id="pageTitle">Dashboard</div>
+            <div class="topbar-sub" id="pageSub">Patient overview &amp; clinical
+              analytics</div>
+          </div>
+          <div class="topbar-right">
+            <span id="liveClock"></span>
+            <button class="ab note" onclick="showView('performance',null)">
+              <i class="fas fa-chart-line"></i> Performance
+            </button>
+          </div>
+        </div>
+
+        <!-- View tabs -->
+        <div class="vtabs">
+          <button class="vtab active" onclick="showView('dashboard',this)"
+            id="tab-dashboard">Dashboard</button>
+          <button class="vtab" onclick="showView('patients',this)"
+            id="tab-patients">All Patients</button>
+          <button class="vtab" onclick="showView('tracking',this)"
+            id="tab-tracking">Patient Tracking</button>
+          <button class="vtab" onclick="showView('appointments',this)"
+            id="tab-appointments">Appointments</button>
+          <button class="vtab" onclick="showView('inbox',this)"
+            id="tab-inbox">Inbox</button>
+          <button class="vtab" onclick="showView('alerts',this)"
+            id="tab-alerts">Alerts</button>
+          <button class="vtab" onclick="showView('performance',this)"
+            id="tab-performance">Performance</button>
+          <button class="vtab" onclick="showView('analytics',this)"
+            id="tab-analytics">Analytics</button>
+        </div>
+
+        <!-- ─────────────── VIEW: DASHBOARD ─────────────── -->
+        <div class="content" id="view-dashboard">
+          <!-- KPIs -->
+          <div class="kpi-grid">
+            <div class="kpi blue">
+              <div class="kpi-glow"></div>
+              <div class="kpi-icon"><i class="fas fa-users"></i></div>
+              <div class="kpi-num">{{ stats.total }}</div>
+              <div class="kpi-lbl">Total Screenings</div>
+              <div class="kpi-chip chip-neu">All time</div>
+            </div>
+            <div class="kpi red">
+              <div class="kpi-glow"></div>
+              <div class="kpi-icon"><i class="fas fa-bone"></i></div>
+              <div class="kpi-num" style="color:var(--red)">{{ stats.high
+                }}</div>
+              <div class="kpi-lbl">Osteoporosis</div>
+              <div class="kpi-chip chip-dn" id="kpiHighPct">–</div>
+            </div>
+            <div class="kpi amber">
+              <div class="kpi-glow"></div>
+              <div class="kpi-icon"><i
+                  class="fas fa-triangle-exclamation"></i></div>
+              <div class="kpi-num" style="color:var(--amber)">{{ stats.medium
+                }}</div>
+              <div class="kpi-lbl">Osteopenia</div>
+              <div class="kpi-chip chip-neu">Monitor</div>
+            </div>
+            <div class="kpi green">
+              <div class="kpi-glow"></div>
+              <div class="kpi-icon"><i class="fas fa-circle-check"></i></div>
+              <div class="kpi-num" style="color:var(--green)">{{ stats.low
+                }}</div>
+              <div class="kpi-lbl">Normal Density</div>
+              <div class="kpi-chip chip-up">Healthy</div>
+            </div>
+          </div>
+
+          <!-- Charts + Alerts -->
+          <div class="row2">
+            <div class="card">
+              <div class="card-hd">
+                <i class="fas fa-chart-pie" style="color:var(--blue)"></i>
+                <h3>Patient Distribution</h3>
+                <span class="hd-badge live">Live</span>
+              </div>
+              <div class="card-body"
+                style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;padding:.75rem 1rem">
+                <div id="dashPie" style="height:200px"></div>
+                <div id="dashTrend" style="height:200px"></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-hd">
+                <i class="fas fa-triangle-exclamation"
+                  style="color:var(--red)"></i>
+                <h3>High-Risk Alerts</h3>
+              </div>
+              <div class="card-body" id="dashAlerts"
+                style="padding:.7rem .85rem"></div>
+            </div>
+          </div>
+
+          <!-- Recent table -->
+          <div class="card">
+            <div class="card-hd">
+              <i class="fas fa-clock-rotate-left" style="color:var(--blue)"></i>
+              <h3>Recent Assessments</h3>
+              <button class="ab view" style="margin-left:auto"
+                onclick="showView('patients',null)">
+                <i class="fas fa-list"></i> View All
+              </button>
+            </div>
+            <div style="overflow-x:auto">
+              <table class="pt-tbl">
+                <thead>
+                  <tr>
+                    <th>Patient</th><th>Date</th><th>Age</th><th>Gender</th>
+                    <th>T-Score</th><th>BMI</th><th>Diagnosis</th><th>Conf.</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="recentBody"></tbody>
+                <tfoot><tr><td colspan="9"
+                      id="recentFoot">Loading…</td></tr></tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────────────── VIEW: ALL PATIENTS ─────────────── -->
+        <div class="content" id="view-patients" style="display:none">
+          <div class="card" style="overflow:hidden">
+            <div class="filter-row">
+              <input class="fi" type="text" id="ptSearch"
+                placeholder="🔍  Search patient name…" oninput="filterPt()"
+                style="min-width:200px">
+              <select class="fi" id="ptDiag" onchange="filterPt()">
+                <option value>All Diagnoses</option>
+                <option value="Osteoporosis">Osteoporosis</option>
+                <option value="Osteopenia">Osteopenia</option>
+                <option value="Normal">Normal</option>
+              </select>
+              <select class="fi" id="ptGender" onchange="filterPt()">
+                <option value>All Genders</option>
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+              </select>
+              <span class="fi-count" id="ptCount">– records</span>
+              <button class="ab view" onclick="exportCSV()"><i
+                  class="fas fa-download"></i> Export CSV</button>
+            </div>
+            <div style="overflow-x:auto">
+              <table class="pt-tbl">
+                <thead>
+                  <tr>
+                    <th>#</th><th>Patient</th><th>Date</th><th>Age</th><th>Gender</th>
+                    <th>T-Score</th><th>Z-Score</th><th>BMI</th><th>Diagnosis</th>
+                    <th>Conf.</th><th>Mode</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="ptBody"></tbody>
+                <tfoot><tr><td colspan="12"
+                      id="ptFoot">Loading…</td></tr></tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────────────── VIEW: ALERTS ─────────────── -->
+        <div class="content" id="view-alerts" style="display:none">
+          <div class="card">
+            <div class="card-hd">
+              <i class="fas fa-triangle-exclamation"
+                style="color:var(--red)"></i>
+              <h3>High-Risk Patient Alerts</h3>
+              <span class="hd-badge"
+                style="background:var(--red-lt);color:var(--red)"
+                id="fullAlertCount">0 patients</span>
+            </div>
+            <div class="card-body" id="alertFull"></div>
+          </div>
+        </div>
+
+        <!-- ─────────────── VIEW: PERFORMANCE ─────────────── -->
+        <div class="content" id="view-performance" style="display:none">
+          <div class="row3">
+            <!-- Clinical activity card -->
+            <div class="card">
+              <div class="card-hd">
+                <i class="fas fa-stethoscope" style="color:var(--blue)"></i>
+                <h3>Clinical Activity</h3>
+              </div>
+              <div class="card-body"
+                style="display:flex;flex-direction:column;gap:.7rem">
+                <div class="det-stat"
+                  style="display:flex;align-items:center;gap:.75rem">
+                  <div
+                    style="width:34px;height:34px;border-radius:9px;background:var(--blue-lt);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0"><i
+                      class="fas fa-clipboard-list"></i></div>
+                  <div><div class="det-lbl">Total Assessments</div><div
+                      class="det-val" id="pTot">0</div></div>
+                </div>
+                <div class="det-stat"
+                  style="display:flex;align-items:center;gap:.75rem">
+                  <div
+                    style="width:34px;height:34px;border-radius:9px;background:var(--green-lt);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0"><i
+                      class="fas fa-check-double"></i></div>
+                  <div><div class="det-lbl">Normal Diagnoses</div><div
+                      class="det-val" id="pNorm">0</div></div>
+                </div>
+                <div class="det-stat"
+                  style="display:flex;align-items:center;gap:.75rem">
+                  <div
+                    style="width:34px;height:34px;border-radius:9px;background:var(--red-lt);color:var(--red);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0"><i
+                      class="fas fa-bone"></i></div>
+                  <div><div class="det-lbl">Critical Cases</div><div
+                      class="det-val" id="pCrit">0</div></div>
+                </div>
+                <div class="det-stat"
+                  style="display:flex;align-items:center;gap:.75rem">
+                  <div
+                    style="width:34px;height:34px;border-radius:9px;background:var(--amber-lt);color:var(--amber);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0"><i
+                      class="fas fa-triangle-exclamation"></i></div>
+                  <div><div class="det-lbl">Osteopenia Cases</div><div
+                      class="det-val" id="pMed">0</div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Detection pie -->
+            <div class="card">
+              <div class="card-hd">
+                <i class="fas fa-chart-donut" style="color:var(--teal)"></i>
+                <h3>Detection Breakdown</h3>
+              </div>
+              <div class="card-body">
+                <div id="perfPie" style="height:210px"></div>
+              </div>
+            </div>
+
+            <!-- Performance metrics -->
+            <div class="card">
+              <div class="card-hd">
+                <i class="fas fa-medal" style="color:var(--amber)"></i>
+                <h3>Performance Metrics</h3>
+              </div>
+              <div class="card-body">
+                <div class="perf-bar-row">
+                  <div class="perf-bar-lbl"><span>Detection Rate</span><span
+                      id="pDetRate" style="color:var(--blue)">–</span></div>
+                  <div class="perf-bar-track"><div class="perf-bar-fill"
+                      id="pDetBar"
+                      style="background:var(--blue);width:0%"></div></div>
+                </div>
+                <div class="perf-bar-row">
+                  <div class="perf-bar-lbl"><span>Avg. Model
+                      Confidence</span><span id="pConf"
+                      style="color:var(--teal)">–</span></div>
+                  <div class="perf-bar-track"><div class="perf-bar-fill"
+                      id="pConfBar"
+                      style="background:var(--teal);width:0%"></div></div>
+                </div>
+                <div class="perf-bar-row">
+                  <div class="perf-bar-lbl"><span>High-Risk Rate</span><span
+                      id="pHrRate" style="color:var(--red)">–</span></div>
+                  <div class="perf-bar-track"><div class="perf-bar-fill"
+                      id="pHrBar"
+                      style="background:var(--red);width:0%"></div></div>
+                </div>
+                <div class="perf-bar-row">
+                  <div class="perf-bar-lbl"><span>X-Ray Utilisation</span><span
+                      id="pXray" style="color:var(--purple)">–</span></div>
+                  <div class="perf-bar-track"><div class="perf-bar-fill"
+                      id="pXrayBar"
+                      style="background:var(--purple);width:0%"></div></div>
+                </div>
+                <div class="score-ring" style="margin-top:.85rem">
+                  <div class="score-num" id="pScore">–</div>
+                  <div class="score-lbl">Composite Performance Score<br><span
+                      style="font-size:.62rem;opacity:.6">detection × confidence
+                      × volume</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Monthly trend -->
+          <div class="card">
+            <div class="card-hd">
+              <i class="fas fa-chart-area" style="color:var(--blue)"></i>
+              <h3>Monthly Assessment Trend</h3>
+            </div>
+            <div class="card-body"><div id="perfTrend"
+                style="height:250px"></div></div>
+          </div>
+
+          <!-- T-Score distribution -->
+          <div class="card">
+            <div class="card-hd">
+              <i class="fas fa-chart-column" style="color:var(--teal)"></i>
+              <h3>T-Score Distribution</h3>
+              <span class="hd-badge blue">All patients</span>
+            </div>
+            <div class="card-body"><div id="perfTsDist"
+                style="height:210px"></div></div>
+          </div>
+
+          <!-- Performance Goals -->
+          <div class="card">
+            <div class="card-hd">
+              <i class="fas fa-bullseye" style="color:var(--green)"></i>
+              <h3>Clinical Performance Goals</h3>
+              <span class="hd-badge"
+                style="background:var(--green-lt);color:var(--green)">Monthly
+                targets</span>
+            </div>
+            <div class="card-body" id="perfGoals">
+              <div style="color:var(--muted);font-size:.8rem">Loading
+                goals…</div>
+            </div>
+          </div>
+        </div><!-- /view-performance -->
+
+        <!-- ─────────────── VIEW: ANALYTICS ─────────────── -->
+        <div class="content" id="view-analytics" style="display:none">
+          <div class="row2" style="grid-template-columns:1fr 1fr">
+            <div class="card">
+              <div class="card-hd"><i class="fas fa-venus-mars"
+                  style="color:var(--blue)"></i><h3>Gender
+                  Distribution</h3></div>
+              <div class="card-body"><div id="anGender"
+                  style="height:210px"></div></div>
+            </div>
+            <div class="card">
+              <div class="card-hd"><i class="fas fa-person"
+                  style="color:var(--teal)"></i><h3>Age Group
+                  Breakdown</h3></div>
+              <div class="card-body"><div id="anAge"
+                  style="height:210px"></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-hd">
+              <i class="fas fa-circle-dot" style="color:var(--blue)"></i>
+              <h3>T-Score vs BMI — Patient Population</h3>
+            </div>
+            <div class="card-body"><div id="anScatter"
+                style="height:260px"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-hd">
+              <i class="fas fa-table-cells" style="color:var(--purple)"></i>
+              <h3>Risk Factor Frequency</h3>
+            </div>
+            <div class="card-body"><div id="anRf"
+                style="height:200px"></div></div>
+          </div>
+        </div>
+
+        <!-- ─────────────── VIEW: PATIENT TRACKING ─────────────── -->
+        <div class="content" id="view-tracking" style="display:none">
+          <!-- Summary strip -->
+          <div class="kpi-grid">
+            <div class="kpi blue" style="cursor:default">
+              <div class="kpi-glow"></div>
+              <div class="kpi-icon"><i class="fas fa-users"></i></div>
+              <div class="kpi-num" id="trkTotal">0</div>
+              <div class="kpi-lbl">Unique Patients</div>
+              <div class="kpi-chip chip-neu">Tracked</div>
+            </div>
+            <div class="kpi red" style="cursor:default">
+              <div class="kpi-glow"></div>
+              <div class="kpi-icon"><i
+                  class="fas fa-exclamation-circle"></i></div>
+              <div class="kpi-num" id="trkOverdue"
+                style="color:var(--red)">0</div>
+              <div class="kpi-lbl">Overdue Follow-ups</div>
+              <div class="kpi-chip chip-dn">Action needed</div>
+            </div>
+            <div class="kpi amber" style="cursor:default">
+              <div class="kpi-glow"></div>
+              <div class="kpi-icon"><i class="fas fa-calendar-days"></i></div>
+              <div class="kpi-num" id="trkThisWeek"
+                style="color:var(--amber)">0</div>
+              <div class="kpi-lbl">Due This Week</div>
+              <div class="kpi-chip chip-neu">Scheduled</div>
+            </div>
+            <div class="kpi green" style="cursor:default">
+              <div class="kpi-glow"></div>
+              <div class="kpi-icon"><i class="fas fa-chart-line"></i></div>
+              <div class="kpi-num" id="trkImproved"
+                style="color:var(--green)">0</div>
+              <div class="kpi-lbl">Improving</div>
+              <div class="kpi-chip chip-up">T-Score trend</div>
+            </div>
+          </div>
+
+          <!-- Filter + Add row -->
+          <div class="card" style="overflow:hidden">
+            <div class="filter-row">
+              <input class="fi" type="text" id="trkSearch"
+                placeholder="🔍  Search patient…" oninput="renderTracking()"
+                style="min-width:200px">
+              <select class="fi" id="trkFilter" onchange="renderTracking()">
+                <option value>All Patients</option>
+                <option value="overdue">Overdue Follow-up</option>
+                <option value="osteoporosis">Osteoporosis</option>
+                <option value="osteopenia">Osteopenia</option>
+                <option value="normal">Normal</option>
+              </select>
+              <button class="ab view" onclick="openIntakePanel()"
+                style="margin-left:auto">
+                <i class="fas fa-user-plus"></i> Register Patient
+              </button>
+              <button class="ab note" onclick="exportPatientCards()">
+                <i class="fas fa-download"></i> Export
+              </button>
+            </div>
+            <div id="trkCards" class="pt-card-grid"></div>
+          </div>
+        </div>
+
+        <!-- ─────────────── VIEW: APPOINTMENTS ─────────────── -->
+        <div class="content" id="view-appointments" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 360px;gap:1.2rem">
+
+            <!-- Calendar heat + upcoming list -->
+            <div style="display:flex;flex-direction:column;gap:1.2rem">
+              <!-- Workload heatmap -->
+              <div class="card">
+                <div class="card-hd">
+                  <i class="fas fa-calendar-alt" style="color:var(--blue)"></i>
+                  <h3>Last 12 Weeks — Assessment Workload</h3>
+                  <span class="hd-badge blue">Heatmap</span>
+                </div>
+                <div class="card-body" style="padding:.6rem">
+                  <div style="display:flex;gap:3px;margin-bottom:4px"
+                    id="heatWeekLabels"></div>
+                  <div id="heatGrid"></div>
+                  <div
+                    style="display:flex;align-items:center;gap:.4rem;margin-top:.5rem;font-size:.65rem;color:var(--muted)">
+                    <span>Less</span>
+                    <span class="heat-day l0"
+                      style="width:12px;height:12px;border-radius:3px;display:inline-block"></span>
+                    <span class="heat-day l1"
+                      style="width:12px;height:12px;border-radius:3px;display:inline-block"></span>
+                    <span class="heat-day l2"
+                      style="width:12px;height:12px;border-radius:3px;display:inline-block"></span>
+                    <span class="heat-day l3"
+                      style="width:12px;height:12px;border-radius:3px;display:inline-block"></span>
+                    <span class="heat-day l4"
+                      style="width:12px;height:12px;border-radius:3px;display:inline-block"></span>
+                    <span>More</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Upcoming appointments list -->
+              <div class="card">
+                <div class="card-hd">
+                  <i class="fas fa-list-check" style="color:var(--teal)"></i>
+                  <h3>Scheduled Appointments</h3>
+                  <span class="hd-badge live" id="apptCount">0</span>
+                </div>
+                <div style="padding:.7rem .9rem" id="apptListFull"></div>
+                <div
+                  style="padding:.65rem 1.1rem;border-top:1px solid var(--border);background:var(--bg)">
+                  <button class="ab view" onclick="exportAppts()"
+                    style="font-size:.75rem">
+                    <i class="fas fa-file-csv"></i> Export to CSV
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Add appointment + daily agenda -->
+            <div style="display:flex;flex-direction:column;gap:1.2rem">
+              <div class="card">
+                <div class="card-hd"
+                  style="background:linear-gradient(135deg,var(--navy),var(--navy2))">
+                  <i class="fas fa-calendar-plus" style="color:#93C5FD"></i>
+                  <h3 style="color:#fff">Schedule Appointment</h3>
+                </div>
+                <div class="card-body"
+                  style="display:flex;flex-direction:column;gap:.5rem">
+                  <div class="intake-row">
+                    <label class="intake-lbl">Patient Name</label>
+                    <input class="intake-val" id="apptPatient" type="text"
+                      placeholder="Full name">
+                  </div>
+                  <div class="intake-row">
+                    <label class="intake-lbl">Date</label>
+                    <input class="intake-val" id="apptDate" type="date">
+                  </div>
+                  <div class="intake-row">
+                    <label class="intake-lbl">Time</label>
+                    <input class="intake-val" id="apptTime" type="time"
+                      value="09:00">
+                  </div>
+                  <div class="intake-row">
+                    <label class="intake-lbl">Type</label>
+                    <select class="intake-val" id="apptType">
+                      <option>DEXA Follow-up</option>
+                      <option>Initial Consultation</option>
+                      <option>Medication Review</option>
+                      <option>Results Discussion</option>
+                      <option>General Check-up</option>
+                    </select>
+                  </div>
+                  <div class="intake-row">
+                    <label class="intake-lbl">Priority</label>
+                    <select class="intake-val" id="apptPriority">
+                      <option value="scheduled">Normal</option>
+                      <option value="urgent">Urgent</option>
+                      <option value="completed">Completed</option>
+                    </select>
+                  </div>
+                  <div class="intake-row">
+                    <label class="intake-lbl">Notes</label>
+                    <input class="intake-val" id="apptNotes" type="text"
+                      placeholder="Optional notes">
+                  </div>
+                  <button class="ab note" onclick="addAppt()"
+                    style="justify-content:center;padding:.5rem;margin-top:.3rem">
+                    <i class="fas fa-calendar-plus"></i> Schedule Appointment
+                  </button>
+                </div>
+              </div>
+
+              <!-- Today's mini-agenda -->
+              <div class="card">
+                <div class="card-hd">
+                  <i class="fas fa-clock" style="color:var(--amber)"></i>
+                  <h3>Today's Agenda</h3>
+                </div>
+                <div class="card-body" id="todayAgenda"
+                  style="font-size:.8rem"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─────────────── VIEW: INBOX ─────────────── -->
+        <div class="content" id="view-inbox" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 360px;gap:1.2rem">
+            <!-- Message list -->
+            <div class="card" style="overflow:hidden">
+              <div class="card-hd">
+                <i class="fas fa-inbox" style="color:var(--blue)"></i>
+                <h3>Patient Messages & Notifications</h3>
+                <span class="hd-badge live" id="unreadCount">3 unread</span>
+              </div>
+              <div id="msgList"></div>
+            </div>
+
+            <!-- Compose + Quick reply -->
+            <div style="display:flex;flex-direction:column;gap:1.2rem">
+              <div class="card">
+                <div class="card-hd"
+                  style="background:linear-gradient(135deg,var(--navy),var(--navy2))">
+                  <i class="fas fa-pen-to-square" style="color:#93C5FD"></i>
+                  <h3 style="color:#fff">Compose Message</h3>
+                </div>
+                <div class="card-body"
+                  style="display:flex;flex-direction:column;gap:.5rem">
+                  <div class="intake-row">
+                    <label class="intake-lbl">To Patient</label>
+                    <input class="intake-val" id="msgTo" type="text"
+                      placeholder="Patient name">
+                  </div>
+                  <div class="intake-row">
+                    <label class="intake-lbl">Subject</label>
+                    <select class="intake-val" id="msgSubject">
+                      <option>Follow-up Reminder</option>
+                      <option>Lab Results Ready</option>
+                      <option>Medication Change</option>
+                      <option>Appointment Confirmation</option>
+                      <option>Test Result — Action Required</option>
+                      <option>Custom Message</option>
+                    </select>
+                  </div>
+                  <textarea class="note-area" id="msgBody"
+                    placeholder="Type your message here…"
+                    style="min-height:90px"></textarea>
+                  <button class="ab view" onclick="sendMessage()"
+                    style="justify-content:center;padding:.5rem">
+                    <i class="fas fa-paper-plane"></i> Send Message
+                  </button>
+                </div>
+              </div>
+
+              <!-- Quick templates -->
+              <div class="card">
+                <div class="card-hd">
+                  <i class="fas fa-bolt" style="color:var(--amber)"></i>
+                  <h3>Quick Templates</h3>
+                </div>
+                <div class="card-body"
+                  style="display:flex;flex-direction:column;gap:.4rem">
+                  <button class="ab note" onclick="useTemplate('fu')"
+                    style="justify-content:flex-start;padding:.42rem .65rem">
+                    <i class="fas fa-calendar-check"></i> Follow-up Due Reminder
+                  </button>
+                  <button class="ab rx" onclick="useTemplate('med')"
+                    style="justify-content:flex-start;padding:.42rem .65rem">
+                    <i class="fas fa-pills"></i> Medication Refill Reminder
+                  </button>
+                  <button class="ab view" onclick="useTemplate('results')"
+                    style="justify-content:flex-start;padding:.42rem .65rem">
+                    <i class="fas fa-file-medical"></i> Results Available
+                  </button>
+                  <button class="ab"
+                    style="border-color:var(--green);color:var(--green);justify-content:flex-start;padding:.42rem .65rem"
+                    onclick="useTemplate('normal')">
+                    <i class="fas fa-circle-check"></i> Normal Results —
+                    Reassurance
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /main -->
+    </div><!-- /shell -->
+
+    <!-- ── Toast zone ── -->
+    <div id="docToastZone"></div>
+
+    <!-- ═══════════════════════════════════════════════════════ PANELS -->
+    <div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+    <!-- Patient detail panel -->
+    <div class="panel" id="detPanel">
+      <div class="panel-hd"
+        style="background:linear-gradient(135deg,var(--navy),var(--navy2))">
+        <i class="fas fa-user-injured" style="color:#93C5FD"></i>
+        <h3 style="color:#fff" id="detName">Patient Details</h3>
+        <button class="panel-x" onclick="closeAll()"
+          style="color:rgba(255,255,255,.6)"><i
+            class="fas fa-times"></i></button>
+      </div>
+      <div class="panel-body" id="detBody"></div>
+    </div>
+
+    <!-- Notes panel -->
+    <div class="panel" id="notesPanel">
+      <div class="panel-hd"
+        style="background:linear-gradient(135deg,#0A5C49,var(--teal))">
+        <i class="fas fa-note-sticky" style="color:#A7F3D0"></i>
+        <h3 style="color:#fff">Doctor's Notes</h3>
+        <button class="panel-x" onclick="closeAll()"
+          style="color:rgba(255,255,255,.6)"><i
+            class="fas fa-times"></i></button>
+      </div>
+      <div class="panel-body">
+        <div class="det-lbl" style="margin-bottom:.5rem" id="noteFor"></div>
+        <textarea class="note-area" id="noteTxt"
+          placeholder="Clinical observations, follow-up instructions, medication notes…"></textarea>
+        <div style="display:flex;gap:.5rem;margin-top:.65rem">
+          <button class="ab note" onclick="saveNote()"
+            style="flex:1;justify-content:center;padding:.45rem"><i
+              class="fas fa-floppy-disk"></i> Save Note</button>
+          <button class="ab"
+            style="border-color:var(--border);color:var(--muted)"
+            onclick="document.getElementById('noteTxt').value=''"><i
+              class="fas fa-eraser"></i> Clear</button>
+        </div>
+        <div id="noteList" style="margin-top:1rem"></div>
+      </div>
+    </div>
+
+    <!-- Prescription panel -->
+    <div class="panel" id="rxPanel">
+      <div class="panel-hd"
+        style="background:linear-gradient(135deg,#6B3000,#92400E)">
+        <i class="fas fa-prescription" style="color:#FCD34D"></i>
+        <h3 style="color:#fff">Prescription Builder</h3>
+        <button class="panel-x" onclick="closeAll()"
+          style="color:rgba(255,255,255,.6)"><i
+            class="fas fa-times"></i></button>
+      </div>
+      <div class="panel-body">
+        <div class="sec-title">Quick-Add — Common Medications</div>
+        <div id="drugBtns"></div>
+        <div class="sec-title" style="margin-top:.85rem">Prescription List</div>
+        <div id="rxList"></div>
+        <div style="margin-top:.75rem">
+          <input class="fi" id="rxCustom" type="text"
+            placeholder="Add custom drug or instruction…"
+            style="width:100%;margin-bottom:.5rem">
+          <button class="ab rx" onclick="addCustomRx()"
+            style="width:100%;justify-content:center;padding:.48rem"><i
+              class="fas fa-plus"></i> Add to List</button>
+        </div>
+        <div class="sec-title" style="margin-top:.85rem">Prescribing
+          Doctor</div>
+        <div style="font-size:.82rem;color:var(--muted);line-height:1.7">
+          Dr. {{ doc_profile.get('name','') }}<br>
+          {{ doc_profile.get('specialty','') }}{% if doc_profile.get('hospital')
+          %} · {{ doc_profile.get('hospital','') }}{% endif %}<br>
+          {% if doc_profile.get('license') %}License: {{
+          doc_profile.get('license','') }}{% endif %}
+        </div>
+        <button class="ab view" onclick="printRx()"
+          style="width:100%;justify-content:center;padding:.55rem;margin-top:1rem">
+          <i class="fas fa-print"></i> Print Prescription
+        </button>
+      </div>
+    </div>
+
+    <!-- Patient intake panel -->
+    <div class="panel" id="intakePanel">
+      <div class="panel-hd"
+        style="background:linear-gradient(135deg,#0A5C49,var(--teal))">
+        <i class="fas fa-user-plus" style="color:#A7F3D0"></i>
+        <h3 style="color:#fff">Register New Patient</h3>
+        <button class="panel-x" onclick="closeAll()"
+          style="color:rgba(255,255,255,.6)"><i
+            class="fas fa-times"></i></button>
+      </div>
+      <div class="panel-body">
+        <div class="sec-title">Patient Demographics</div>
+        <div class="intake-row"><label class="intake-lbl">Full
+            Name</label><input class="intake-val" id="intakeName" type="text"
+            placeholder="e.g. Jane Doe"></div>
+        <div class="intake-row"><label class="intake-lbl">Age</label><input
+            class="intake-val" id="intakeAge" type="number" min="1" max="120"
+            placeholder="Years"></div>
+        <div class="intake-row">
+          <label class="intake-lbl">Gender</label>
+          <select class="intake-val"
+            id="intakeGender"><option>Female</option><option>Male</option><option>Other</option></select>
+        </div>
+        <div class="intake-row"><label class="intake-lbl">BMI</label><input
+            class="intake-val" id="intakeBmi" type="number" step="0.1"
+            placeholder="kg/m²"></div>
+        <div class="intake-row"><label class="intake-lbl">Contact</label><input
+            class="intake-val" id="intakeContact" type="text"
+            placeholder="Phone or email"></div>
+        <div class="sec-title" style="margin-top:.85rem">Clinical Details</div>
+        <div class="intake-row"><label class="intake-lbl">T-Score</label><input
+            class="intake-val" id="intakeTs" type="number" step="0.1"
+            placeholder="-3.2"></div>
+        <div class="intake-row">
+          <label class="intake-lbl">Diagnosis</label>
+          <select class="intake-val" id="intakeDiag">
+            <option>Normal</option><option>Osteopenia</option><option>Osteoporosis</option>
+          </select>
+        </div>
+        <div class="intake-row"><label
+            class="intake-lbl">Physician</label><input class="intake-val"
+            id="intakeDoc" type="text" placeholder="Referring doctor"
+            value="{{ doc_profile.get('name','') }}"></div>
+        <div class="intake-row">
+          <label class="intake-lbl">Follow-up</label>
+          <input class="intake-val" id="intakeFollowup" type="date">
+        </div>
+        <div class="intake-row"><label class="intake-lbl">Notes</label><textarea
+            class="intake-val" id="intakeNotes"
+            style="resize:vertical;height:70px"
+            placeholder="Clinical notes…"></textarea></div>
+        <button class="ab note" onclick="saveIntake()"
+          style="width:100%;justify-content:center;padding:.55rem;margin-top:.75rem">
+          <i class="fas fa-floppy-disk"></i> Register Patient
+        </button>
+      </div>
+    </div>
+
+    <script>
+function saveIntake() {
+  var name = document.getElementById('intakeName')?.value.trim();
+  if (!name) { docToast('Patient name is required', 'warn'); return; }
+  var record = {
+    patient_name: name, age: document.getElementById('intakeAge')?.value,
+    gender: document.getElementById('intakeGender')?.value,
+    bmi: document.getElementById('intakeBmi')?.value,
+    t_score: document.getElementById('intakeTs')?.value,
+    prediction: document.getElementById('intakeDiag')?.value,
+    confidence: 0, timestamp: new Date().toISOString(),
+    contact: document.getElementById('intakeContact')?.value,
+    physician: document.getElementById('intakeDoc')?.value,
+    notes: document.getElementById('intakeNotes')?.value,
+    manually_registered: true
+  };
+  // Schedule follow-up
+  var fu = document.getElementById('intakeFollowup')?.value;
+  if (fu) {
+    var appts = loadAppts();
+    appts.push({ id: Date.now(), patient: name, date: fu, time: '09:00', type: 'DEXA Follow-up', priority: 'scheduled', notes: 'Registered via intake form' });
+    saveAppts(appts);
+  }
+  // Save to local registry
+  var reg = []; try { reg = JSON.parse(localStorage.getItem('osteo_manual_patients')) || []; } catch(e) {}
+  reg.unshift(record); localStorage.setItem('osteo_manual_patients', JSON.stringify(reg));
+  // Add to REC for immediate display
+  REC.unshift(record);
+  renderTracking(); renderAppts(); buildRecent();
+  closeAll();
+  docToast(name + ' registered successfully!', 'success');
+}
+</script>
+
+    <script>
+// ── Data ──────────────────────────────────────────────────────────────────────
+var REC = {{ records|safe }};
+var filtered = REC.slice();
+
+// ── Clock ─────────────────────────────────────────────────────────────────────
+function tick(){
+  var n=new Date();
+  document.getElementById('liveClock').textContent=
+    n.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+'  '+
+    n.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+setInterval(tick,1000); tick();
+
+// ── Sidebar avatar initials ───────────────────────────────────────────────────
+(function(){
+  var n='{{ doc_profile.get("name","D") }}';
+  document.getElementById('sbAvatar').textContent=(n||'D')[0].toUpperCase();
+})();
+
+// ── View switching ─────────────────────────────────────────────────────────────
+var VIEWS=['dashboard','patients','alerts','performance','analytics','tracking','appointments','inbox'];
+var VIEW_META={
+  dashboard:    ['Dashboard','Patient overview & clinical analytics'],
+  patients:     ['All Patients','Search, filter and manage all records'],
+  alerts:       ['High-Risk Alerts','Patients requiring immediate attention'],
+  performance:  ['My Performance','Clinical activity & diagnostic metrics'],
+  analytics:    ['Population Analytics','Distributions and cohort insights'],
+  tracking:     ['Patient Tracking','Monitor follow-ups, progress and patient timelines'],
+  appointments: ['Appointments','Schedule & manage patient appointments'],
+  inbox:        ['Inbox','Patient messages and clinical notifications'],
+};
+function showView(v,el){
+  VIEWS.forEach(function(id){
+    var d=document.getElementById('view-'+id);
+    if(d) d.style.display=(id===v?'flex':'none');
+    var t=document.getElementById('tab-'+id);
+    if(t) t.classList.toggle('active',id===v);
+  });
+  document.querySelectorAll('.sb-link').forEach(function(b){b.classList.remove('active');});
+  if(el && el.classList && el.classList.contains('sb-link')) el.classList.add('active');
+  var m=VIEW_META[v]||[v,''];
+  document.getElementById('pageTitle').textContent=m[0];
+  document.getElementById('pageSub').textContent=m[1];
+  if(v==='performance')  { buildPerformance(); setTimeout(function(){ if(typeof buildPerformanceGoals==='function') buildPerformanceGoals(); },300); }
+  if(v==='analytics')    buildAnalytics();
+  if(v==='alerts')       buildAlertFull();
+  if(v==='patients')     renderPtTable();
+  if(v==='tracking')     { if(typeof renderTracking==='function') renderTracking(); }
+  if(v==='appointments') { if(typeof renderAppts==='function') renderAppts(); if(typeof buildHeatmap==='function') buildHeatmap(); }
+  if(v==='inbox')        { if(typeof renderMessages==='function') renderMessages(); }
+}
+
+// ── HTML helpers ───────────────────────────────────────────────────────────────
+function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function rb(p){
+  var c=(p||'').toLowerCase().replace(/\s+/g,'');
+  var i=c==='osteoporosis'?'⚠':c==='osteopenia'?'!':'✓';
+  return '<span class="rb '+c+'">'+i+' '+esc(p)+'</span>';
+}
+function cf(v){
+  var pct=parseFloat(v)||0;
+  var col=pct>=85?'var(--green)':pct>=65?'var(--blue)':'var(--amber)';
+  return '<span class="cf">'+pct.toFixed(1)+'%<span class="cf-bar"><span class="cf-fill" style="width:'+pct+'%;background:'+col+'"></span></span></span>';
+}
+function tsColor(ts){
+  var v=parseFloat(ts);
+  return isNaN(v)?'var(--muted)':v<=-2.5?'var(--red)':v<=-1?'var(--amber)':'var(--green)';
+}
+
+// ── Render recent table ────────────────────────────────────────────────────────
+function buildRecent(){
+  var r20=REC.slice(0,20);
+  var body=document.getElementById('recentBody');
+  var foot=document.getElementById('recentFoot');
+  if(!r20.length){foot.textContent='No assessments yet.';return;}
+  body.innerHTML=r20.map(function(r,i){
+    return '<tr onclick="openDetail('+i+')">'+
+      '<td style="font-weight:700">'+esc(r.patient_name||'—')+'</td>'+
+      '<td style="color:var(--muted);font-family:JetBrains Mono,monospace;font-size:.74rem">'+esc((r.timestamp||'').slice(0,10))+'</td>'+
+      '<td style="color:var(--muted)">'+esc(r.age||'—')+'</td>'+
+      '<td style="color:var(--muted)">'+esc(r.gender||'—')+'</td>'+
+      '<td style="font-family:JetBrains Mono,monospace;font-weight:700;color:'+tsColor(r.t_score)+'">'+esc(r.t_score||'—')+'</td>'+
+      '<td style="color:var(--muted)">'+esc(r.bmi||'—')+'</td>'+
+      '<td>'+rb(r.prediction)+'</td>'+
+      '<td>'+cf(r.confidence)+'</td>'+
+      '<td><div style="display:flex;gap:.28rem">'+
+        '<button class="ab view" onclick="event.stopPropagation();openDetail('+i+')"><i class="fas fa-eye"></i></button>'+
+        '<button class="ab note" onclick="event.stopPropagation();openNotes('+i+')"><i class="fas fa-note-sticky"></i></button>'+
+      '</div></td>'+
+    '</tr>';
+  }).join('');
+  foot.textContent='Showing '+r20.length+' of '+REC.length+' total';
+}
+
+// ── Patient table (filterable) ─────────────────────────────────────────────────
+function filterPt(){
+  var q=(document.getElementById('ptSearch').value||'').toLowerCase();
+  var d=(document.getElementById('ptDiag').value||'').toLowerCase();
+  var g=(document.getElementById('ptGender').value||'').toLowerCase();
+  filtered=REC.filter(function(r){
+    return (r.patient_name||'').toLowerCase().includes(q) &&
+           (!d || (r.prediction||'').toLowerCase()===d) &&
+           (!g || (r.gender||'').toLowerCase()===g);
+  });
+  renderPtTable();
+}
+function renderPtTable(){
+  var body=document.getElementById('ptBody');
+  var foot=document.getElementById('ptFoot');
+  document.getElementById('ptCount').textContent=filtered.length+' records';
+  if(!filtered.length){body.innerHTML='';foot.textContent='No matching records.';return;}
+  body.innerHTML=filtered.map(function(r,i){
+    var ri=REC.indexOf(r);
+    return '<tr onclick="openDetail('+ri+')">'+
+      '<td style="color:var(--muted);font-family:JetBrains Mono,monospace;font-size:.71rem">'+(i+1)+'</td>'+
+      '<td style="font-weight:700">'+esc(r.patient_name||'—')+'</td>'+
+      '<td style="color:var(--muted);font-family:JetBrains Mono,monospace;font-size:.72rem">'+esc((r.timestamp||'').slice(0,16))+'</td>'+
+      '<td style="color:var(--muted)">'+esc(r.age||'—')+'</td>'+
+      '<td style="color:var(--muted)">'+esc(r.gender||'—')+'</td>'+
+      '<td style="font-family:JetBrains Mono,monospace;font-weight:700;color:'+tsColor(r.t_score)+'">'+esc(r.t_score||'—')+'</td>'+
+      '<td style="color:var(--muted);font-family:JetBrains Mono,monospace">'+esc(r.z_score||'—')+'</td>'+
+      '<td style="color:var(--muted)">'+esc(r.bmi||'—')+'</td>'+
+      '<td>'+rb(r.prediction)+'</td>'+
+      '<td>'+cf(r.confidence)+'</td>'+
+      '<td style="color:var(--sub);font-size:.72rem;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(r.analysis_mode||'')+'">'+esc((r.analysis_mode||'—').slice(0,18))+'</td>'+
+      '<td><div style="display:flex;gap:.25rem">'+
+        '<button class="ab view" onclick="event.stopPropagation();openDetail('+ri+')"><i class="fas fa-eye"></i></button>'+
+        '<button class="ab note" onclick="event.stopPropagation();openNotes('+ri+')"><i class="fas fa-note-sticky"></i></button>'+
+        '<button class="ab rx"   onclick="event.stopPropagation();openPanel(\'rxPanel\')"><i class="fas fa-prescription"></i></button>'+
+        '<button class="ab pdf"  onclick="event.stopPropagation();dlPDF('+ri+')"><i class="fas fa-file-pdf"></i></button>'+
+      '</div></td>'+
+    '</tr>';
+  }).join('');
+  foot.textContent='Showing '+filtered.length+' of '+REC.length+' records';
+}
+
+// ── Alert sidebar items ────────────────────────────────────────────────────────
+function buildAlerts(){
+  var hi=REC.filter(function(r){return r.prediction==='Osteoporosis';});
+  var wa=REC.filter(function(r){return r.prediction==='Osteopenia';}).slice(0,4);
+  document.getElementById('alBadge').textContent=hi.length;
+  document.getElementById('ptBadge').textContent=REC.length;
+  var al=document.getElementById('dashAlerts');
+  var items=hi.slice(0,5).map(function(r){
+    var ri=REC.indexOf(r);
+    return '<div class="al-item danger" onclick="openDetail('+ri+')">'+
+      '<span class="al-dot danger"></span>'+
+      '<div><div class="al-name">'+esc(r.patient_name||'Patient')+'</div>'+
+      '<div class="al-sub">T: '+esc(r.t_score||'—')+' · Age '+esc(r.age||'—')+'</div></div>'+
+      '<span class="al-ts danger">'+esc((r.timestamp||'').slice(0,10))+'</span>'+
+    '</div>';
+  }).concat(wa.slice(0,3).map(function(r){
+    var ri=REC.indexOf(r);
+    return '<div class="al-item warning" onclick="openDetail('+ri+')">'+
+      '<span class="al-dot warning"></span>'+
+      '<div><div class="al-name">'+esc(r.patient_name||'Patient')+'</div>'+
+      '<div class="al-sub">T: '+esc(r.t_score||'—')+' · Osteopenia</div></div>'+
+      '<span class="al-ts warning">'+esc((r.timestamp||'').slice(0,10))+'</span>'+
+    '</div>';
+  }));
+  al.innerHTML=items.length?items.join(''):
+    '<div style="color:var(--muted);font-size:.82rem;text-align:center;padding:1.5rem">No high-risk alerts</div>';
+}
+
+function buildAlertFull(){
+  var hi=REC.filter(function(r){return(r.prediction||'')!=='Normal';});
+  document.getElementById('fullAlertCount').textContent=hi.length+' patients';
+  var el=document.getElementById('alertFull');
+  if(!hi.length){el.innerHTML='<div style="color:var(--muted);text-align:center;padding:2rem;font-size:.85rem">No high-risk patients found.</div>';return;}
+  el.innerHTML=hi.map(function(r,i){
+    var ri=REC.indexOf(r);
+    var cls=r.prediction==='Osteoporosis'?'danger':'warning';
+    return '<div class="al-item '+cls+'" onclick="openDetail('+ri+')" style="margin-bottom:.5rem">'+
+      '<span class="al-dot '+cls+'"></span>'+
+      '<div style="flex:1">'+
+        '<div class="al-name">'+esc(r.patient_name||'Patient')+'</div>'+
+        '<div class="al-sub">'+rb(r.prediction)+' &nbsp; T-Score: '+esc(r.t_score||'—')+' &nbsp; BMI: '+esc(r.bmi||'—')+' &nbsp; '+esc(r.gender||'')+', Age '+esc(r.age||'—')+'</div>'+
+      '</div>'+
+      '<span class="al-ts '+cls+'">'+esc((r.timestamp||'').slice(0,16))+'</span>'+
+    '</div>';
+  }).join('');
+}
+
+// ── Patient detail panel ──────────────────────────────────────────────────────
+function openDetail(idx){
+  var r=REC[idx]; if(!r) return;
+  document.getElementById('detName').textContent=r.patient_name||'Patient';
+  var ts=parseFloat(r.t_score)||0;
+  // Risk factors
+  var rfHtml='';
+  if(r.risk_factors&&r.risk_factors.length){
+    rfHtml='<div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.5rem">'+
+      r.risk_factors.map(function(rf){
+        var lbl=Array.isArray(rf)?rf[0]:rf;
+        var sev=Array.isArray(rf)?rf[2]:'warning';
+        var bg=sev==='danger'?'#FEE2E2':'#FEF3C7';
+        var fg=sev==='danger'?'#7F1D1D':'#78350F';
+        return '<span style="background:'+bg+';color:'+fg+';padding:.18rem .55rem;border-radius:6px;font-size:.71rem;font-weight:700">'+esc(lbl)+'</span>';
+      }).join('')+
+    '</div>';
+  }
+  // History for this patient
+  var hist=REC.filter(function(x){
+    return (x.patient_name||'').toLowerCase()===(r.patient_name||'').toLowerCase();
+  });
+  var tlHtml=hist.slice(0,6).map(function(h){
+    var hc=(h.prediction||'normal').toLowerCase().replace(/\s+/g,'');
+    var ic=hc==='osteoporosis'?'⚠':hc==='osteopenia'?'!':'✓';
+    return '<div class="tl-item">'+
+      '<div class="tl-dot '+hc+'">'+ic+'</div>'+
+      '<div>'+
+        '<div class="tl-date">'+esc((h.timestamp||'').slice(0,16))+'</div>'+
+        '<div class="tl-title">'+rb(h.prediction)+'</div>'+
+        '<div class="tl-sub">T-Score: '+esc(h.t_score||'—')+' &nbsp; Confidence: '+esc(h.confidence||'—')+'%</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  document.getElementById('detBody').innerHTML=
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem">'+
+      '<div class="det-stat"><div class="det-lbl">Age</div><div class="det-val">'+esc(r.age||'—')+'</div></div>'+
+      '<div class="det-stat"><div class="det-lbl">Gender</div><div class="det-val">'+esc(r.gender||'—')+'</div></div>'+
+      '<div class="det-stat"><div class="det-lbl">T-Score</div><div class="det-val" style="color:'+tsColor(ts)+'">'+esc(r.t_score||'—')+'</div></div>'+
+      '<div class="det-stat"><div class="det-lbl">Z-Score</div><div class="det-val">'+esc(r.z_score||'—')+'</div></div>'+
+      '<div class="det-stat"><div class="det-lbl">BMI</div><div class="det-val">'+esc(r.bmi||'—')+'</div></div>'+
+      '<div class="det-stat"><div class="det-lbl">Confidence</div><div class="det-val">'+esc(r.confidence||'—')+'%</div></div>'+
+    '</div>'+
+    '<div style="margin-bottom:.65rem">'+rb(r.prediction)+'</div>'+
+    rfHtml+
+    '<div class="sec-title" style="margin-top:.9rem">Analysis Method</div>'+
+    '<div style="font-size:.81rem;color:var(--muted);padding:.45rem 0">'+esc(r.analysis_mode||'—')+'</div>'+
+    (tlHtml?
+      '<div class="sec-title">Assessment Timeline</div>'+
+      '<div class="tl" style="margin-top:.5rem">'+tlHtml+'</div>':'')+
+    '<div style="display:flex;gap:.5rem;margin-top:1.2rem;flex-wrap:wrap">'+
+      '<button class="ab note" onclick="closeAll();openNotes('+idx+')" style="flex:1;justify-content:center;padding:.45rem"><i class="fas fa-note-sticky"></i> Add Note</button>'+
+      '<button class="ab rx"   onclick="closeAll();openPanel(\'rxPanel\')" style="flex:1;justify-content:center;padding:.45rem"><i class="fas fa-prescription"></i> Prescribe</button>'+
+      '<button class="ab pdf"  onclick="dlPDF('+idx+')" style="flex:1;justify-content:center;padding:.45rem"><i class="fas fa-file-pdf"></i> PDF Report</button>'+
+    '</div>';
+
+  openPanel('detPanel');
+}
+
+// ── PDF download ──────────────────────────────────────────────────────────────
+function dlPDF(idx){
+  var r=REC[idx]; if(!r) return;
+  var body=JSON.stringify({
+    patient_name:r.patient_name||'Patient', age:r.age, gender:r.gender,
+    bmi:r.bmi, t_score:r.t_score, z_score:r.z_score,
+    analysis_mode:r.analysis_mode, prediction:r.prediction,
+    confidence:r.confidence, risk_factors:r.risk_factors||[],
+    xray_file:r.xray_file||'', gradcam_file:r.gradcam_file||'',
+    veg_meals:{}, nonveg_meals:{}, exercises:[]
+  });
+  fetch('/generate-pdf',{method:'POST',headers:{'Content-Type':'application/json'},body:body})
+    .then(function(res){
+      if(!res.ok) throw new Error('PDF failed');
+      return res.blob();
+    })
+    .then(function(blob){
+      var a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='OsteoAI_Report_'+(r.patient_name||'Patient').replace(/\s+/g,'_')+'.pdf';
+      a.click();
+    })
+    .catch(function(e){ alert('PDF error: '+e.message); });
+}
+
+// ── Notes ─────────────────────────────────────────────────────────────────────
+var curNoteKey='';
+function openNotes(idx){
+  var r=REC[idx]; if(!r) return;
+  curNoteKey='note_'+String(r.patient_name||idx).replace(/\W+/g,'_');
+  document.getElementById('noteFor').textContent='Patient: '+(r.patient_name||'Unknown');
+  document.getElementById('noteTxt').value='';
+  renderNotes(); openPanel('notesPanel');
+}
+function saveNote(){
+  var txt=document.getElementById('noteTxt').value.trim();
+  if(!txt){alert('Note is empty');return;}
+  var k=curNoteKey+'_list';
+  var arr=JSON.parse(localStorage.getItem(k)||'[]');
+  arr.unshift({t:new Date().toLocaleString(),v:txt});
+  if(arr.length>30) arr=arr.slice(0,30);
+  localStorage.setItem(k,JSON.stringify(arr));
+  document.getElementById('noteTxt').value='';
+  renderNotes();
+}
+function renderNotes(){
+  var k=curNoteKey+'_list';
+  var arr=JSON.parse(localStorage.getItem(k)||'[]');
+  var el=document.getElementById('noteList');
+  if(!arr.length){el.innerHTML='<div style="color:var(--muted);font-size:.78rem;text-align:center;padding:1rem">No notes saved yet.</div>';return;}
+  el.innerHTML='<div class="sec-title">Saved Notes</div>'+
+    arr.map(function(n){
+      return '<div class="note-saved">'+
+        '<div class="note-saved-time">'+esc(n.t)+'</div>'+
+        '<div class="note-saved-txt">'+esc(n.v)+'</div>'+
+      '</div>';
+    }).join('');
+}
+
+// ── Prescriptions ─────────────────────────────────────────────────────────────
+var rxList=[];
+var DRUGS=[
+  {n:'Alendronate 70 mg',f:'Once weekly (oral)',i:'Take fasting; remain upright 30 min. Check renal function.'},
+  {n:'Risedronate 35 mg',f:'Once weekly (oral)',i:'Same day each week. Avoid lying down 30 min after.'},
+  {n:'Denosumab 60 mg',f:'Every 6 months (SC injection)',i:'Monitor serum calcium. Dental review before initiation.'},
+  {n:'Zoledronic acid 5 mg',f:'Once yearly (IV infusion)',i:'Infuse over ≥15 min. Ensure adequate hydration. Check eGFR.'},
+  {n:'Teriparatide 20 mcg',f:'Daily SC injection (max 2 yrs)',i:'For severe osteoporosis. Prior vertebral fracture required in some guidelines.'},
+  {n:'Calcium 500 mg',f:'Twice daily with meals',i:'Avoid >600 mg/dose. Co-prescribe Vitamin D.'},
+  {n:'Vitamin D3 1000 IU',f:'Once daily',i:'With meals for better absorption. Check 25(OH)D levels after 3 months.'},
+];
+function buildDrugBtns(){
+  document.getElementById('drugBtns').innerHTML=
+    DRUGS.map(function(d,i){
+      return '<button class="drug-btn" onclick="addDrug('+i+')">'+(d.n.length>22?d.n.slice(0,20)+'…':d.n)+'</button>';
+    }).join('');
+}
+function addDrug(i){
+  rxList.push(DRUGS[i]); renderRx();
+}
+function addCustomRx(){
+  var v=document.getElementById('rxCustom').value.trim();
+  if(!v)return;
+  rxList.push({n:v,f:'As directed',i:''});
+  document.getElementById('rxCustom').value='';
+  renderRx();
+}
+function removeRx(i){rxList.splice(i,1);renderRx();}
+function renderRx(){
+  document.getElementById('rxList').innerHTML=rxList.length?
+    rxList.map(function(r,i){
+      return '<div class="rx-item">'+
+        '<div style="flex:1">'+
+          '<div style="font-size:.82rem;font-weight:700">'+esc(r.n)+'</div>'+
+          '<div style="font-size:.7rem;color:var(--muted);margin-top:.1rem">'+esc(r.f)+'</div>'+
+          (r.i?'<div style="font-size:.67rem;color:var(--sub);margin-top:.1rem">'+esc(r.i)+'</div>':'')+
+        '</div>'+
+        '<button class="rx-rm" onclick="removeRx('+i+')"><i class="fas fa-times"></i></button>'+
+      '</div>';
+    }).join(''):
+    '<div style="color:var(--muted);font-size:.78rem;text-align:center;padding:1rem">No drugs added yet.</div>';
+}
+function printRx(){
+  if(!rxList.length){alert('Add at least one medication before printing.');return;}
+  var w=window.open('','_blank','width=620,height=760');
+  var pt=document.getElementById('detName')?.textContent||'Patient';
+  w.document.write('<!DOCTYPE html><html><head><title>Prescription — OsteoAI</title>'+
+    '<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;padding:2.5rem;max-width:560px;margin:auto;color:#111}'+
+    'h2{font-size:1.15rem;font-weight:700;border-bottom:2px solid #0B1D3A;padding-bottom:.5rem;color:#0B1D3A}'+
+    '.meta{font-size:.8rem;color:#555;margin:.5rem 0 1.25rem;line-height:1.7}'+
+    'table{width:100%;border-collapse:collapse;margin-top:.5rem;font-size:.82rem}'+
+    'th{background:#F0F4FA;padding:.45rem .75rem;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.4px;color:#5A6880;border-bottom:1.5px solid #DDE4F0}'+
+    'td{padding:.5rem .75rem;border-bottom:1px solid #EEF2F9;vertical-align:top}'+
+    '.footer{margin-top:2rem;font-size:.72rem;color:#888;border-top:1px solid #DDE4F0;padding-top:.85rem;line-height:1.8}'+
+    '.sig{margin-top:2.5rem;border-top:1px solid #111;width:200px;padding-top:.4rem;font-size:.8rem;color:#444}</style>'+
+    '</head><body>');
+  w.document.write('<h2>OsteoAI — Medical Prescription</h2>');
+  w.document.write('<div class="meta">Patient: <strong>'+esc(pt)+'</strong><br>Date: '+new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})+'</div>');
+  w.document.write('<table><thead><tr><th>#</th><th>Medication</th><th>Dose / Frequency</th><th>Instructions</th></tr></thead><tbody>');
+  rxList.forEach(function(r,i){
+    w.document.write('<tr><td>'+(i+1)+'</td><td><strong>'+esc(r.n)+'</strong></td><td>'+esc(r.f)+'</td><td>'+esc(r.i||'—')+'</td></tr>');
+  });
+  w.document.write('</tbody></table>');
+  w.document.write('<div class="sig">Signature</div>');
+  w.document.write('<div class="footer">Dr. {{ doc_profile.get("name","") }} &nbsp;·&nbsp; {{ doc_profile.get("specialty","") }}<br>'+
+    '{{ doc_profile.get("hospital","") }}<br>'+
+    '{% if doc_profile.get("license") %}License No: {{ doc_profile.get("license","") }}<br>{% endif %}'+
+    '<br><em>This prescription was generated with the assistance of OsteoAI Diagnostic System. The prescribing physician is solely responsible for all clinical decisions.</em></div>');
+  w.document.write('</body></html>');
+  w.document.close(); w.print();
+}
+
+// ── Panel helpers ─────────────────────────────────────────────────────────────
+function openPanel(id){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('open');});
+  document.getElementById(id).classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+}
+function closeAll(){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('open');});
+  document.getElementById('overlay').classList.remove('open');
+}
+
+// ── CSV export ────────────────────────────────────────────────────────────────
+function exportCSV(){
+  var hdr=['Patient','Date','Age','Gender','T-Score','Z-Score','BMI','Diagnosis','Confidence','Mode'];
+  var rows=[hdr].concat(filtered.map(function(r){
+    return[r.patient_name,r.timestamp,r.age,r.gender,r.t_score,r.z_score,r.bmi,r.prediction,r.confidence,r.analysis_mode];
+  }));
+  var csv=rows.map(function(r){return r.map(function(c){return'"'+(c||'').toString().replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='OsteoAI_Patients_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+
+// ── Dashboard charts ──────────────────────────────────────────────────────────
+function buildDashCharts(){
+  var tot={{ stats.total }}, hi={{ stats.high }}, me={{ stats.medium }}, lo={{ stats.low }};
+  var pct=tot?Math.round(hi/tot*100):0;
+  document.getElementById('kpiHighPct').textContent=pct+'% of total';
+
+  Plotly.newPlot('dashPie',[{
+    type:'pie',labels:['Osteoporosis','Osteopenia','Normal'],values:[hi,me,lo],
+    marker:{colors:['#D93025','#C97E0A','#0D8A52']},
+    hole:.42,textinfo:'percent',textfont:{size:10,family:'Inter,sans-serif'},
+  }],{
+    margin:{t:8,b:8,l:8,r:8},paper_bgcolor:'transparent',
+    showlegend:true,legend:{orientation:'v',x:.68,y:.48,font:{size:9,family:'Inter'}},
+    font:{family:'Inter,sans-serif'},height:200,
+  },{displayModeBar:false,responsive:true});
+
+  var months={};
+  REC.forEach(function(r){var m=(r.timestamp||'').slice(0,7);if(m)months[m]=(months[m]||0)+1;});
+  var mk=Object.keys(months).sort().slice(-7);
+  var mv=mk.map(function(m){return months[m];});
+  var ml=mk.map(function(m){var d=new Date(m+'-01');return d.toLocaleString('default',{month:'short'});});
+
+  Plotly.newPlot('dashTrend',[{
+    type:'bar',x:ml,y:mv,
+    marker:{color:'rgba(28,110,242,.7)',line:{color:'#1C6EF2',width:1}},
+  }],{
+    margin:{t:8,b:30,l:28,r:8},paper_bgcolor:'transparent',plot_bgcolor:'transparent',
+    xaxis:{tickfont:{size:8,family:'Inter'},gridcolor:'rgba(221,228,240,.4)'},
+    yaxis:{tickfont:{size:8,family:'Inter'},gridcolor:'rgba(221,228,240,.4)'},
+    font:{family:'Inter,sans-serif',size:9},height:200,
+  },{displayModeBar:false,responsive:true});
+}
+
+// ── Performance charts ────────────────────────────────────────────────────────
+var perfBuilt=false;
+function buildPerformance(){
+  if(perfBuilt) return; perfBuilt=true;
+  var tot=REC.length;
+  var hi=REC.filter(function(r){return r.prediction==='Osteoporosis';}).length;
+  var me=REC.filter(function(r){return r.prediction==='Osteopenia';}).length;
+  var no=REC.filter(function(r){return r.prediction==='Normal';}).length;
+  var avgC=tot?REC.reduce(function(a,r){return a+parseFloat(r.confidence||0);},0)/tot:0;
+  var hiRate=tot?hi/tot*100:0;
+  var detRate=tot?(hi+me)/tot*100:0;
+  var xrayRate=tot?REC.filter(function(r){return r.has_xray;}).length/tot*100:0;
+  var score=Math.round((avgC*.35)+(detRate*.35)+Math.min(tot,100)*.3);
+
+  document.getElementById('pTot').textContent=tot;
+  document.getElementById('pNorm').textContent=no;
+  document.getElementById('pCrit').textContent=hi;
+  document.getElementById('pMed').textContent=me;
+  document.getElementById('pDetRate').textContent=detRate.toFixed(1)+'%';
+  document.getElementById('pConf').textContent=avgC.toFixed(1)+'%';
+  document.getElementById('pHrRate').textContent=hiRate.toFixed(1)+'%';
+  document.getElementById('pXray').textContent=xrayRate.toFixed(1)+'%';
+  document.getElementById('pScore').textContent=score;
+  setTimeout(function(){
+    document.getElementById('pDetBar').style.width=detRate+'%';
+    document.getElementById('pConfBar').style.width=avgC+'%';
+    document.getElementById('pHrBar').style.width=hiRate+'%';
+    document.getElementById('pXrayBar').style.width=xrayRate+'%';
+  },250);
+
+  Plotly.newPlot('perfPie',[{
+    type:'pie',labels:['Osteoporosis','Osteopenia','Normal'],values:[hi,me,no],
+    marker:{colors:['#D93025','#C97E0A','#0D8A52']},
+    hole:.5,textinfo:'value+percent',textfont:{size:9,family:'Inter'},
+  }],{margin:{t:8,b:8,l:8,r:8},paper_bgcolor:'transparent',showlegend:false,font:{family:'Inter'},height:210},{displayModeBar:false,responsive:true});
+
+  // Monthly stacked bar
+  var months={};
+  REC.forEach(function(r){
+    var m=(r.timestamp||'').slice(0,7); if(!m) return;
+    if(!months[m]) months[m]={o:0,p:0,n:0};
+    if(r.prediction==='Osteoporosis') months[m].o++;
+    else if(r.prediction==='Osteopenia') months[m].p++;
+    else months[m].n++;
+  });
+  var mk=Object.keys(months).sort().slice(-12);
+  var ml2=mk.map(function(m){var d=new Date(m+'-01');return d.toLocaleString('default',{month:'short',year:'2-digit'});});
+  Plotly.newPlot('perfTrend',[
+    {type:'bar',name:'Osteoporosis',x:ml2,y:mk.map(function(m){return months[m].o;}),marker:{color:'#D93025'}},
+    {type:'bar',name:'Osteopenia',  x:ml2,y:mk.map(function(m){return months[m].p;}),marker:{color:'#C97E0A'}},
+    {type:'bar',name:'Normal',      x:ml2,y:mk.map(function(m){return months[m].n;}),marker:{color:'#0D8A52'}},
+  ],{
+    barmode:'stack',margin:{t:8,b:40,l:38,r:8},
+    paper_bgcolor:'transparent',plot_bgcolor:'transparent',
+    legend:{orientation:'h',y:-0.22,font:{size:9,family:'Inter'}},
+    xaxis:{tickfont:{size:9},gridcolor:'rgba(221,228,240,.4)'},
+    yaxis:{tickfont:{size:9},gridcolor:'rgba(221,228,240,.4)',title:'Assessments'},
+    font:{family:'Inter',size:9},height:250,
+  },{displayModeBar:false,responsive:true});
+
+  // T-Score histogram
+  var ts=REC.map(function(r){return parseFloat(r.t_score);}).filter(function(v){return!isNaN(v);});
+  Plotly.newPlot('perfTsDist',[{
+    type:'histogram',x:ts,nbinsx:24,
+    marker:{color:'rgba(28,110,242,.65)',line:{color:'#1C6EF2',width:1}},
+  }],{
+    margin:{t:8,b:38,l:42,r:12},paper_bgcolor:'transparent',plot_bgcolor:'transparent',
+    xaxis:{title:'T-Score',tickfont:{size:9},gridcolor:'rgba(221,228,240,.4)'},
+    yaxis:{title:'Patients',tickfont:{size:9},gridcolor:'rgba(221,228,240,.4)'},
+    shapes:[
+      {type:'line',x0:-2.5,x1:-2.5,y0:0,y1:1,yref:'paper',line:{color:'#D93025',width:1.5,dash:'dash'}},
+      {type:'line',x0:-1,  x1:-1,  y0:0,y1:1,yref:'paper',line:{color:'#C97E0A',width:1.5,dash:'dash'}},
+    ],
+    font:{family:'Inter',size:9},height:210,
+  },{displayModeBar:false,responsive:true});
+}
+
+// ── Analytics charts ──────────────────────────────────────────────────────────
+var anBuilt=false;
+function buildAnalytics(){
+  if(anBuilt) return; anBuilt=true;
+  var gf=0,gm=0;
+  REC.forEach(function(r){if((r.gender||'').toLowerCase()==='male')gm++;else gf++;});
+  Plotly.newPlot('anGender',[{
+    type:'pie',labels:['Female','Male'],values:[gf,gm],
+    marker:{colors:['#E879B0','#3B82F6']},hole:.42,
+    textinfo:'percent+label',textfont:{size:10,family:'Inter'},
+  }],{margin:{t:8,b:8,l:8,r:8},paper_bgcolor:'transparent',showlegend:false,font:{family:'Inter'},height:210},{displayModeBar:false,responsive:true});
+
+  var ag={'<40':0,'40–50':0,'50–60':0,'60–70':0,'70+':0};
+  REC.forEach(function(r){
+    var a=parseInt(r.age)||0;
+    if(a<40)ag['<40']++;else if(a<50)ag['40–50']++;else if(a<60)ag['50–60']++;else if(a<70)ag['60–70']++;else ag['70+']++;
+  });
+  Plotly.newPlot('anAge',[{
+    type:'bar',x:Object.keys(ag),y:Object.values(ag),
+    marker:{color:['#3B82F6','#8B5CF6','#EC4899','#F59E0B','#D93025']},
+  }],{
+    margin:{t:8,b:38,l:36,r:8},paper_bgcolor:'transparent',plot_bgcolor:'transparent',
+    xaxis:{tickfont:{size:9}},yaxis:{tickfont:{size:9}},
+    font:{family:'Inter',size:9},height:210,
+  },{displayModeBar:false,responsive:true});
+
+  var sc={osteoporosis:{x:[],y:[],l:[]},osteopenia:{x:[],y:[],l:[]},normal:{x:[],y:[],l:[]}};
+  REC.forEach(function(r){
+    var c=(r.prediction||'normal').toLowerCase().replace(/\s+/g,'');
+    if(sc[c]){sc[c].x.push(parseFloat(r.t_score)||0);sc[c].y.push(parseFloat(r.bmi)||0);sc[c].l.push(r.patient_name||'?');}
+  });
+  Plotly.newPlot('anScatter',[
+    {x:sc.osteoporosis.x,y:sc.osteoporosis.y,text:sc.osteoporosis.l,mode:'markers',name:'Osteoporosis',marker:{color:'#D93025',size:8,opacity:.72}},
+    {x:sc.osteopenia.x,  y:sc.osteopenia.y,  text:sc.osteopenia.l,  mode:'markers',name:'Osteopenia',  marker:{color:'#C97E0A',size:8,opacity:.72}},
+    {x:sc.normal.x,      y:sc.normal.y,      text:sc.normal.l,      mode:'markers',name:'Normal',      marker:{color:'#0D8A52',size:8,opacity:.72}},
+  ],{
+    margin:{t:8,b:48,l:48,r:12},paper_bgcolor:'transparent',plot_bgcolor:'rgba(240,244,250,1)',
+    xaxis:{title:'T-Score',tickfont:{size:9},gridcolor:'rgba(221,228,240,.6)'},
+    yaxis:{title:'BMI',tickfont:{size:9},gridcolor:'rgba(221,228,240,.6)'},
+    legend:{font:{size:9,family:'Inter'}},hovermode:'closest',
+    font:{family:'Inter',size:9},height:260,
+  },{displayModeBar:false,responsive:true});
+
+  // Risk factor frequency bar
+  var rfCount={};
+  REC.forEach(function(r){
+    (r.risk_factors||[]).forEach(function(rf){
+      var lbl=Array.isArray(rf)?rf[0]:rf;
+      rfCount[lbl]=(rfCount[lbl]||0)+1;
+    });
+  });
+  var rfK=Object.keys(rfCount).sort(function(a,b){return rfCount[b]-rfCount[a];}).slice(0,10);
+  var rfV=rfK.map(function(k){return rfCount[k];});
+  Plotly.newPlot('anRf',[{
+    type:'bar',orientation:'h',
+    x:rfV,y:rfK,
+    marker:{color:'rgba(107,63,160,.7)',line:{color:'#6B3FA0',width:1}},
+  }],{
+    margin:{t:8,b:32,l:120,r:12},paper_bgcolor:'transparent',plot_bgcolor:'transparent',
+    xaxis:{title:'Frequency',tickfont:{size:9}},yaxis:{tickfont:{size:9}},
+    font:{family:'Inter',size:9},height:200,
+  },{displayModeBar:false,responsive:true});
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+buildRecent();
+filterPt();
+buildAlerts();
+buildDashCharts();
+buildDrugBtns();
+renderRx();
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ★ NEW FEATURES — Patient Tracking, Appointments, Inbox, Performance Goals
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Extended view list ───────────────────────────────────────────────────────
+// (tracking/appointments/inbox already in VIEWS — see showView above)
+
+// ── Doctor Toast System ───────────────────────────────────────────────────────
+function docToast(msg, type, dur) {
+  type = type || 'info'; dur = dur || 3600;
+  var zone = document.getElementById('docToastZone'); if (!zone) return;
+  var icons = {info:'fa-circle-info', success:'fa-circle-check', warn:'fa-triangle-exclamation', danger:'fa-circle-xmark'};
+  var el = document.createElement('div');
+  el.className = 'doc-toast ' + type;
+  el.innerHTML = '<i class="fas ' + (icons[type]||icons.info) + '" style="font-size:.9rem;flex-shrink:0"></i><span>' + msg + '</span>';
+  zone.appendChild(el);
+  setTimeout(function(){ el.classList.add('removing'); setTimeout(function(){ el.remove(); }, 230); }, dur);
+}
+
+// ── Unique patients helper ───────────────────────────────────────────────────
+function getUniquePatients() {
+  var seen = {}, pts = [];
+  REC.forEach(function(r) {
+    var key = (r.patient_name||'Unknown').toLowerCase().trim();
+    if (!seen[key]) {
+      seen[key] = true;
+      pts.push({
+        name: r.patient_name || 'Unknown',
+        records: REC.filter(function(x){ return (x.patient_name||'').toLowerCase().trim() === key; })
+                    .sort(function(a,b){ return (b.timestamp||'').localeCompare(a.timestamp||''); }),
+        latest: r
+      });
+    }
+  });
+  return pts;
+}
+
+// ── Patient Tracking View ────────────────────────────────────────────────────
+function renderTracking() {
+  var pts = getUniquePatients();
+  var q   = (document.getElementById('trkSearch')?.value||'').toLowerCase();
+  var flt = (document.getElementById('trkFilter')?.value||'').toLowerCase();
+  var today = new Date(); today.setHours(0,0,0,0);
+
+  // Compute follow-up status for each patient
+  pts.forEach(function(p) {
+    var last = new Date(p.latest.timestamp || Date.now());
+    var pred = (p.latest.prediction||'Normal').toLowerCase();
+    var daysSince = Math.round((today - last) / 86400000);
+    // target: osteoporosis=90d, osteopenia=180d, normal=365d
+    var target = pred==='osteoporosis' ? 90 : pred==='osteopenia' ? 180 : 365;
+    p.daysSince  = daysSince;
+    p.target     = target;
+    p.status     = daysSince > target ? 'overdue' : daysSince > target*0.8 ? 'soon' : (daysSince < 7 ? 'new' : 'ok');
+    p.pred       = pred;
+    // T-score trend
+    var ts = p.records.map(function(r){ return parseFloat(r.t_score); }).filter(function(v){ return !isNaN(v); });
+    p.trendUp = ts.length >= 2 && ts[0] > ts[1];   // most recent > previous
+  });
+
+  // KPI counters
+  var overdue   = pts.filter(function(p){ return p.status==='overdue'; }).length;
+  var thisWeek  = pts.filter(function(p){ return p.status==='soon'; }).length;
+  var improved  = pts.filter(function(p){ return p.trendUp; }).length;
+  var el = function(id){ return document.getElementById(id); };
+  if(el('trkTotal'))    el('trkTotal').textContent = pts.length;
+  if(el('trkOverdue'))  el('trkOverdue').textContent = overdue;
+  if(el('trkThisWeek')) el('trkThisWeek').textContent = thisWeek;
+  if(el('trkImproved')) el('trkImproved').textContent = improved;
+  if(overdue > 0 && el('followBadge')) { el('followBadge').style.display='flex'; el('followBadge').textContent=overdue; }
+
+  // Filter
+  if (q) pts = pts.filter(function(p){ return p.name.toLowerCase().includes(q); });
+  if (flt === 'overdue')       pts = pts.filter(function(p){ return p.status==='overdue'; });
+  else if (flt === 'osteoporosis') pts = pts.filter(function(p){ return p.pred==='osteoporosis'; });
+  else if (flt === 'osteopenia')   pts = pts.filter(function(p){ return p.pred==='osteopenia'; });
+  else if (flt === 'normal')       pts = pts.filter(function(p){ return p.pred==='normal'; });
+
+  var cards = document.getElementById('trkCards');
+  if (!cards) return;
+  if (!pts.length) { cards.innerHTML = '<div style="padding:2rem;color:var(--muted);text-align:center;font-size:.85rem;grid-column:1/-1"><i class="fas fa-user-slash" style="font-size:1.4rem;display:block;margin-bottom:.5rem;opacity:.3"></i>No patients found.</div>'; return; }
+
+  cards.innerHTML = pts.map(function(p, idx) {
+    var r = p.latest;
+    var tsNum  = parseFloat(r.t_score);
+    var tsCol  = isNaN(tsNum) ? 'var(--muted)' : tsNum<=-2.5 ? 'var(--red)' : tsNum<=-1 ? 'var(--amber)' : 'var(--green)';
+    var initials = p.name.split(' ').map(function(w){ return w[0]; }).join('').slice(0,2).toUpperCase();
+    var statusLabels = {overdue:'⚠ Overdue', soon:'📅 Due Soon', new:'✨ New Patient', ok:'✓ Up to Date'};
+    var statusClasses = {overdue:'overdue', soon:'soon', new:'new', ok:'ok'};
+    var trendHtml = p.trendUp
+      ? '<span style="color:var(--green);font-size:.7rem;font-weight:700"><i class="fas fa-arrow-trend-up"></i> Improving</span>'
+      : '<span style="color:var(--muted);font-size:.7rem"><i class="fas fa-minus"></i> Stable</span>';
+
+    return '<div class="pt-card" onclick="openDetailByName(\''+esc(p.name)+'\')">' +
+      '<div class="pt-card-top">' +
+        '<div class="pt-avatar '+p.pred+'">' + initials + '</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div class="pt-card-name">' + esc(p.name) + '</div>' +
+          '<div class="pt-card-sub">' + esc(r.age||'?') + 'y · ' + esc(r.gender||'?') + ' · ' + p.records.length + ' visit' + (p.records.length!==1?'s':'') + '</div>' +
+        '</div>' +
+        trendHtml +
+      '</div>' +
+      '<div class="pt-card-stats">' +
+        '<div class="pt-stat"><div class="pt-stat-v" style="color:'+tsCol+'">' + esc(r.t_score||'–') + '</div><div class="pt-stat-l">T-Score</div></div>' +
+        '<div class="pt-stat"><div class="pt-stat-v">' + esc(r.bmi||'–') + '</div><div class="pt-stat-l">BMI</div></div>' +
+        '<div class="pt-stat"><div class="pt-stat-v">' + parseFloat(r.confidence||0).toFixed(0) + '%</div><div class="pt-stat-l">Confidence</div></div>' +
+      '</div>' +
+      '<div class="pt-card-foot">' +
+        '<span class="follow-badge '+statusClasses[p.status]+'">' + statusLabels[p.status] + '</span>' +
+        '<span style="font-size:.67rem;color:var(--muted);margin-left:.5rem">' + p.daysSince + 'd ago</span>' +
+        '<div class="pt-actions">' +
+          '<button class="ab view" onclick="event.stopPropagation();openDetailByName(\''+esc(p.name)+'\')" title="View Detail"><i class="fas fa-eye"></i></button>' +
+          '<button class="ab note" onclick="event.stopPropagation();openNotesByName(\''+esc(p.name)+'\')" title="Notes"><i class="fas fa-note-sticky"></i></button>' +
+          '<button class="ab pdf" onclick="event.stopPropagation();downloadCardPdf(\''+esc(p.name)+'\')" title="PDF"><i class="fas fa-file-pdf"></i></button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// helper: open detail by patient name
+function openDetailByName(name) {
+  var idx = REC.findIndex(function(r){ return (r.patient_name||'') === name; });
+  if (idx >= 0) openDetail(idx);
+}
+function openNotesByName(name) {
+  var idx = REC.findIndex(function(r){ return (r.patient_name||'') === name; });
+  if (idx >= 0) openNotes(idx);
+}
+function downloadCardPdf(name) {
+  var pt = REC.find(function(r){ return (r.patient_name||'') === name; }) || {};
+  docToast('Generating PDF for ' + name + '…', 'info', 2500);
+  var payload = {
+    patient_name: name, age: pt.age, gender: pt.gender,
+    bmi: pt.bmi, t_score: pt.t_score, z_score: pt.z_score,
+    analysis_mode: pt.analysis_mode,
+    prediction: pt.prediction, confidence: pt.confidence,
+    risk_factors: pt.risk_factors||[]
+  };
+  fetch('/generate-pdf', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)})
+    .then(function(r){ return r.blob(); })
+    .then(function(b){
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(b);
+      a.download = 'OsteoAI_' + name.replace(/\s+/g,'_') + '.pdf';
+      a.click();
+      docToast('PDF downloaded!', 'success');
+    }).catch(function(){ docToast('PDF generation failed', 'danger'); });
+}
+function exportPatientCards() {
+  var pts = getUniquePatients();
+  var hdr = ['Patient','Last Visit','Age','Gender','T-Score','BMI','Diagnosis','Visits','Status'];
+  var today = new Date(); today.setHours(0,0,0,0);
+  var rows = pts.map(function(p) {
+    var r = p.latest;
+    var daysSince = Math.round((today - new Date(r.timestamp||Date.now())) / 86400000);
+    var pred = (r.prediction||'Normal').toLowerCase();
+    var target = pred==='osteoporosis' ? 90 : pred==='osteopenia' ? 180 : 365;
+    return [p.name, (r.timestamp||'').slice(0,10), r.age, r.gender, r.t_score, r.bmi, r.prediction, p.records.length, daysSince > target ? 'Overdue' : 'OK'];
+  });
+  var csv = [hdr].concat(rows).map(function(r){ return r.map(function(c){ return '"'+(c||'').toString().replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+  var a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'OsteoAI_Patient_Tracking_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  docToast('CSV exported!', 'success');
+}
+
+// ── Appointments ─────────────────────────────────────────────────────────────
+function loadAppts() {
+  try { return JSON.parse(localStorage.getItem('osteo_appts')) || []; } catch(e) { return []; }
+}
+function saveAppts(arr) { localStorage.setItem('osteo_appts', JSON.stringify(arr)); }
+
+function addAppt() {
+  var patient  = document.getElementById('apptPatient')?.value.trim();
+  var date     = document.getElementById('apptDate')?.value;
+  var time     = document.getElementById('apptTime')?.value || '09:00';
+  var type     = document.getElementById('apptType')?.value;
+  var priority = document.getElementById('apptPriority')?.value || 'scheduled';
+  var notes    = document.getElementById('apptNotes')?.value.trim();
+  if (!patient || !date) { docToast('Patient name and date are required', 'warn'); return; }
+  var arr = loadAppts();
+  arr.push({ id: Date.now(), patient, date, time, type, priority, notes, created: new Date().toISOString() });
+  arr.sort(function(a,b){ return (a.date+a.time).localeCompare(b.date+b.time); });
+  saveAppts(arr);
+  ['apptPatient','apptNotes'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  renderAppts();
+  docToast('Appointment scheduled for ' + patient, 'success');
+}
+
+function removeAppt(id) {
+  var arr = loadAppts().filter(function(a){ return a.id !== id; });
+  saveAppts(arr); renderAppts();
+  docToast('Appointment removed', 'warn');
+}
+
+function markApptDone(id) {
+  var arr = loadAppts();
+  arr.forEach(function(a){ if(a.id===id) a.priority='completed'; });
+  saveAppts(arr); renderAppts();
+  docToast('Marked as completed', 'success');
+}
+
+function renderAppts() {
+  var arr = loadAppts();
+  var today = new Date().toISOString().slice(0,10);
+  var todayAppts = arr.filter(function(a){ return a.date === today; });
+  var el = document.getElementById('apptCount');
+  if (el) el.textContent = arr.length + ' total';
+
+  var list = document.getElementById('apptListFull');
+  if (list) {
+    if (!arr.length) { list.innerHTML = '<div style="padding:1rem;color:var(--muted);text-align:center;font-size:.8rem">No appointments scheduled.</div>'; }
+    else list.innerHTML = arr.map(function(a) {
+      var isToday = a.date === today;
+      return '<div class="appt-item" style="' + (isToday ? 'background:#EFF6FF;border-color:#BFDBFE' : '') + '">' +
+        '<span class="appt-dot ' + esc(a.priority) + '"></span>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div class="appt-name">' + esc(a.patient) + (isToday ? ' <span style="color:var(--blue);font-size:.65rem;font-weight:700">TODAY</span>' : '') + '</div>' +
+          '<div class="appt-date">' + esc(a.date) + ' ' + esc(a.time) + ' · ' + esc(a.type) + '</div>' +
+          (a.notes ? '<div style="font-size:.68rem;color:var(--muted);margin-top:.1rem">' + esc(a.notes) + '</div>' : '') +
+        '</div>' +
+        '<button class="ab note" onclick="markApptDone(' + a.id + ')" title="Mark done" style="padding:.2rem .4rem;font-size:.67rem"><i class="fas fa-check"></i></button>' +
+        '<button class="appt-rm" onclick="removeAppt(' + a.id + ')"><i class="fas fa-times"></i></button>' +
+      '</div>';
+    }).join('');
+  }
+
+  var agenda = document.getElementById('todayAgenda');
+  if (agenda) {
+    if (!todayAppts.length) agenda.innerHTML = '<div style="color:var(--muted);font-size:.8rem;text-align:center;padding:.5rem">No appointments today.</div>';
+    else agenda.innerHTML = todayAppts.map(function(a) {
+      return '<div style="display:flex;align-items:center;gap:.6rem;padding:.45rem 0;border-bottom:1px solid var(--border)">' +
+        '<span style="font-family:JetBrains Mono,monospace;font-size:.75rem;font-weight:700;color:var(--blue)">' + esc(a.time) + '</span>' +
+        '<div><div style="font-size:.78rem;font-weight:700">' + esc(a.patient) + '</div><div style="font-size:.67rem;color:var(--muted)">' + esc(a.type) + '</div></div>' +
+      '</div>';
+    }).join('');
+  }
+}
+
+function exportAppts() {
+  var arr = loadAppts();
+  var hdr = ['Patient','Date','Time','Type','Priority','Notes'];
+  var rows = arr.map(function(a){ return [a.patient, a.date, a.time, a.type, a.priority, a.notes||'']; });
+  var csv = [hdr].concat(rows).map(function(r){ return r.map(function(c){ return '"'+(c||'').replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+  var link = document.createElement('a');
+  link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  link.download = 'OsteoAI_Appointments.csv';
+  link.click();
+  docToast('Appointments exported', 'success');
+}
+
+// ── Workload heatmap ─────────────────────────────────────────────────────────
+function buildHeatmap() {
+  var grid = document.getElementById('heatGrid'); if (!grid) return;
+  // Count assessments by date
+  var counts = {};
+  REC.forEach(function(r){ var d=(r.timestamp||'').slice(0,10); if(d) counts[d]=(counts[d]||0)+1; });
+  // 12 weeks = 84 days back from today
+  var today = new Date(); today.setHours(0,0,0,0);
+  var days = [];
+  for (var i = 83; i >= 0; i--) {
+    var d = new Date(today); d.setDate(d.getDate() - i);
+    var ds = d.toISOString().slice(0,10);
+    days.push({ date: ds, count: counts[ds] || 0, dow: d.getDay() });
+  }
+  var maxC = Math.max.apply(null, days.map(function(d){ return d.count; })) || 1;
+
+  grid.innerHTML = days.map(function(d) {
+    var lvl = d.count===0 ? 'l0' : d.count<maxC*0.25 ? 'l1' : d.count<maxC*0.5 ? 'l2' : d.count<maxC*0.75 ? 'l3' : 'l4';
+    return '<div class="heat-day ' + lvl + '" title="' + d.date + ': ' + d.count + ' assessments">' + (d.count||'') + '</div>';
+  }).join('');
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = 'repeat(7,1fr)';
+  grid.style.gap = '3px';
+}
+
+// ── Inbox / Messages ─────────────────────────────────────────────────────────
+var MESSAGES = [
+  { id:1, from:'Sarah Mitchell', avatar:'SM', color:'#1C6EF2', subject:'Follow-up Query', preview:'Hi Doctor, I wanted to ask about my last T-score result…', time:'10:32', unread:true },
+  { id:2, from:'James O\'Brien',  avatar:'JO', color:'#0A9870', subject:'Medication Question', preview:'I have been taking the Alendronate for 3 weeks and experiencing…', time:'09:15', unread:true },
+  { id:3, from:'Priya Sharma',   avatar:'PS', color:'#6B3FA0', subject:'Appointment Request', preview:'Could we reschedule my DEXA follow-up to next Tuesday?', time:'Yesterday', unread:true },
+  { id:4, from:'Robert Chen',    avatar:'RC', color:'#C97E0A', subject:'Test Results Received', preview:'I got the bloodwork results from the lab. Calcium is 9.1…', time:'2 days ago', unread:false },
+  { id:5, from:'Emma Thompson',  avatar:'ET', color:'#D93025', subject:'Urgent: Hip Pain', preview:'Experiencing sharp hip pain since yesterday morning…', time:'3 days ago', unread:false },
+];
+var sentMessages = [];
+
+function renderMessages() {
+  var list = document.getElementById('msgList'); if (!list) return;
+  var unread = MESSAGES.filter(function(m){ return m.unread; }).length;
+  var ub = document.getElementById('unreadCount'); if(ub) ub.textContent = unread + ' unread';
+  var ib = document.getElementById('inboxBadge'); if(ib) ib.textContent = unread;
+  list.innerHTML = MESSAGES.map(function(m) {
+    return '<div class="msg-item' + (m.unread ? ' unread' : '') + '" onclick="openMessage(' + m.id + ')">' +
+      '<div class="msg-avatar" style="background:' + m.color + ';color:#fff">' + m.avatar + '</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="display:flex;align-items:center;gap:.4rem">' +
+          '<span class="msg-name">' + esc(m.from) + '</span>' +
+          (m.unread ? '<span class="msg-unread-dot"></span>' : '') +
+        '</div>' +
+        '<div style="font-size:.72rem;font-weight:600;color:var(--text);margin-top:.08rem">' + esc(m.subject) + '</div>' +
+        '<div class="msg-preview">' + esc(m.preview) + '</div>' +
+      '</div>' +
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:.3rem">' +
+        '<span class="msg-time">' + m.time + '</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  // Show sent messages below
+  if (sentMessages.length) {
+    list.innerHTML += '<div style="padding:.6rem 1rem;font-size:.7rem;font-weight:700;color:var(--muted);background:var(--bg);border-top:1px solid var(--border)">SENT</div>' +
+      sentMessages.map(function(m) {
+        return '<div class="msg-item">' +
+          '<div class="msg-avatar" style="background:var(--teal);color:#fff">Dr</div>' +
+          '<div style="flex:1;min-width:0"><div class="msg-name">To: ' + esc(m.to) + '</div>' +
+          '<div style="font-size:.72rem;font-weight:600;color:var(--text)">' + esc(m.subject) + '</div>' +
+          '<div class="msg-preview">' + esc(m.body) + '</div></div>' +
+          '<span class="msg-time">' + m.time + '</span>' +
+        '</div>';
+      }).join('');
+  }
+}
+
+function openMessage(id) {
+  var m = MESSAGES.find(function(x){ return x.id===id; });
+  if (!m) return;
+  m.unread = false;
+  renderMessages();
+  document.getElementById('msgTo').value = m.from;
+  document.getElementById('msgSubject').value = 'RE: ' + m.subject;
+  document.getElementById('msgBody').value = '';
+  docToast('Opened: ' + m.subject, 'info', 2000);
+}
+
+function sendMessage() {
+  var to      = document.getElementById('msgTo')?.value.trim();
+  var subject = document.getElementById('msgSubject')?.value.trim();
+  var body    = document.getElementById('msgBody')?.value.trim();
+  if (!to || !body) { docToast('Fill in recipient and message body', 'warn'); return; }
+  var now = new Date();
+  sentMessages.unshift({ to, subject, body, time: now.getHours()+':'+String(now.getMinutes()).padStart(2,'0') });
+  document.getElementById('msgBody').value = '';
+  renderMessages();
+  docToast('Message sent to ' + to, 'success');
+}
+
+var TEMPLATES = {
+  fu: { subject:'Follow-up Due Reminder', body:'Dear {patient},\n\nYour follow-up DEXA scan is now due based on your last assessment. Please contact us to schedule your appointment at your earliest convenience.\n\nBest regards,\nDr. {{ doc_profile.get("name","Your Doctor") }}' },
+  med: { subject:'Medication Refill Reminder', body:'Dear {patient},\n\nThis is a reminder that your bone health medication prescription is due for renewal. Please contact the clinic to arrange a repeat prescription.\n\nBest regards,\nDr. {{ doc_profile.get("name","Your Doctor") }}' },
+  results: { subject:'Your Test Results Are Available', body:'Dear {patient},\n\nYour recent test results are now available. Please schedule a consultation to discuss your results and next steps.\n\nBest regards,\nDr. {{ doc_profile.get("name","Your Doctor") }}' },
+  normal: { subject:'Reassuring Test Results — Normal Bone Density', body:'Dear {patient},\n\nI am pleased to inform you that your recent bone density assessment has returned normal results. Please continue your current calcium and vitamin D regimen and maintain regular physical activity.\n\nBest regards,\nDr. {{ doc_profile.get("name","Your Doctor") }}' },
+};
+function useTemplate(key) {
+  var t = TEMPLATES[key]; if (!t) return;
+  document.getElementById('msgSubject').value = t.subject;
+  document.getElementById('msgBody').value    = t.body;
+  docToast('Template loaded', 'info', 1800);
+}
+
+// ── Patient Intake panel ──────────────────────────────────────────────────────
+function openIntakePanel() { openPanel('intakePanel'); }
+
+// ── Performance Goals (enhanced Performance view) ─────────────────────────────
+function buildPerformanceGoals() {
+  var tot = REC.length;
+  var hi  = REC.filter(function(r){ return r.prediction==='Osteoporosis'; }).length;
+  var me  = REC.filter(function(r){ return r.prediction==='Osteopenia'; }).length;
+  var avg = tot ? REC.reduce(function(a,r){ return a+parseFloat(r.confidence||0); },0)/tot : 0;
+  var xr  = tot ? REC.filter(function(r){ return r.has_xray; }).length/tot*100 : 0;
+  // goals
+  var goals = [
+    { label:'Monthly Assessments',    val:Math.min(tot,30), target:30, col:'var(--blue)',   note:'Target: 30 assessments/month' },
+    { label:'Avg. Model Confidence',   val:avg,              target:95, col:'var(--teal)',   note:'Target: ≥ 95% confidence' },
+    { label:'High-Risk Detection Rate',val:tot?(hi+me)/tot*100:0,target:100,col:'var(--red)',note:'All high-risk cases flagged' },
+    { label:'X-Ray Utilisation',       val:xr,               target:60, col:'var(--purple)', note:'Target: ≥ 60% of assessments' },
+    { label:'Follow-up Compliance',    val:Math.min(75,tot), target:100,col:'var(--amber)',  note:'Patients with follow-up scheduled' },
+  ];
+  var container = document.getElementById('perfGoals'); if (!container) return;
+  container.innerHTML = goals.map(function(g) {
+    var pct = Math.min((g.val / g.target) * 100, 100);
+    var achieved = pct >= 100;
+    return '<div class="goal-card">' +
+      '<div class="goal-top">' +
+        '<span class="goal-lbl">' + g.label + (achieved ? ' <i class="fas fa-circle-check" style="color:var(--green);font-size:.75rem"></i>' : '') + '</span>' +
+        '<span class="goal-pct" style="color:' + g.col + '">' + g.val.toFixed(g.val%1===0?0:1) + ' / ' + g.target + '</span>' +
+      '</div>' +
+      '<div class="goal-track"><div class="goal-fill" style="width:0%;background:' + g.col + '" data-pct="' + pct + '"></div></div>' +
+      '<div class="goal-note">' + g.note + '</div>' +
+    '</div>';
+  }).join('');
+  // animate bars
+  setTimeout(function(){
+    container.querySelectorAll('.goal-fill').forEach(function(b){ b.style.width = b.dataset.pct + '%'; });
+  }, 200);
+}
+
+// (showView already handles all views above)
+
+
+// ── Init new features ─────────────────────────────────────────────────────────
+(function init() {
+  renderTracking();   // pre-compute follow-up badges
+  renderAppts();
+  renderMessages();
+  docToast('Portal loaded — ' + REC.length + ' assessments available', 'info', 3000);
+})();
+</script>
+  </body>
+</html>

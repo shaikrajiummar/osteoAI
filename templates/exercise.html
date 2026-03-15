@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+{% block title %}Exercise Hub — OsteoAI{% endblock %}
+
+{% block extra_head %}
+<style>
+.yt-card{background:var(--bg-card);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--border);transition:transform .25s,box-shadow .25s;}
+.yt-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);}
+.yt-thumb{position:relative;cursor:pointer;aspect-ratio:16/9;overflow:hidden;background:#000;border-radius:0;}
+.yt-thumb img{width:100%;height:100%;object-fit:cover;transition:opacity .3s;}
+.yt-thumb:hover img{opacity:.75;}
+.yt-play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(220,0,0,.92);display:flex;align-items:center;justify-content:center;color:white;font-size:1.4rem;transition:transform .2s,background .2s;pointer-events:none;box-shadow:0 4px 18px rgba(0,0,0,.4);}
+.yt-thumb:hover .yt-play-btn{transform:translate(-50%,-50%) scale(1.12);background:rgba(220,0,0,1);}
+.yt-iframe-wrap{aspect-ratio:16/9;width:100%;display:none;}
+.yt-iframe-wrap iframe{width:100%;height:100%;border:none;}
+.yt-info{padding:1rem;}
+.yt-info h4{font-size:.9rem;font-weight:700;color:var(--text-primary);margin-bottom:.25rem;}
+.yt-info p{font-size:.78rem;color:var(--text-muted);line-height:1.5;}
+.ex-tab-row{display:flex;gap:4px;background:#f0f4f8;border-radius:10px;padding:4px;margin-bottom:1.5rem;flex-wrap:wrap;}
+.ex-tab{flex:1;min-width:120px;padding:.65rem 1rem;border-radius:8px;background:transparent;border:none;font-size:.83rem;font-weight:600;color:var(--text-muted);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.4rem;}
+.ex-tab:hover{color:var(--primary);}
+.ex-tab.active{background:white;color:var(--primary);box-shadow:var(--shadow-sm);}
+.ex-panel{display:none;}
+.ex-panel.active{display:block;}
+.ex-guide-item{display:flex;align-items:flex-start;gap:1rem;padding:1rem;background:#f8fafc;border-radius:10px;border:1px solid var(--border);}
+.ex-guide-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-icon" style="background:linear-gradient(135deg,#e53e3e,#9b2c2c);"><i class="fas fa-dumbbell"></i></div>
+  <div class="page-header-text">
+    <h1>Bone Health &amp; Rehabilitation Hub</h1>
+    <p>Curated exercises to strengthen bones and prevent falls</p>
+  </div>
+</div>
+
+<div style="background:#fffbeb;border:1px solid #fbbf24;border-radius:10px;padding:.85rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;font-size:.88rem;color:#92400e;">
+  <i class="fas fa-triangle-exclamation"></i>
+  <span><strong>Medical Notice:</strong> Consult your doctor before starting any new exercise program, especially if diagnosed with Osteoporosis.</span>
+</div>
+
+<!-- TAB BUTTONS -->
+<div class="ex-tab-row" id="exTabRow">
+  <button class="ex-tab active" id="exBtnBeg" onclick="showExTab('tabBeg',this)"><i class="fas fa-seedling"></i> Beginner</button>
+  <button class="ex-tab" id="exBtnStr" onclick="showExTab('tabStr',this)"><i class="fas fa-fire"></i> Strength</button>
+  <button class="ex-tab" id="exBtnFall" onclick="showExTab('tabFall',this)"><i class="fas fa-person-falling-burst"></i> Fall Prevention</button>
+  <button class="ex-tab" id="exBtnGuide" onclick="showExTab('tabGuide',this)"><i class="fas fa-book-open"></i> Exercise Guide</button>
+</div>
+
+<!-- BEGINNER -->
+<div id="tabBeg" class="ex-panel active">
+  <div class="section-title"><i class="fas fa-seedling"></i> Gentle Movements for Mobility</div>
+  <div class="two-col mb-4">
+    <div class="yt-card">
+      <div class="yt-thumb" onclick="loadYT(this,'nm7roKZX7Lc')" data-id="nm7roKZX7Lc">
+        <img src="https://img.youtube.com/vi/nm7roKZX7Lc/mqdefault.jpg" alt="Sit-to-Stand Exercise" loading="lazy">
+        <div class="yt-play-btn"><i class="fab fa-youtube"></i></div>
+      </div>
+      <div class="yt-iframe-wrap" id="yt-nm7roKZX7Lc"></div>
+      <div class="yt-info">
+        <h4>1. Sit-to-Stand Exercise</h4>
+        <p>Builds lower body strength and improves functional mobility for daily activities.</p>
+        <div style="margin-top:.5rem;display:flex;gap:.4rem;align-items:center;">
+          <span class="badge badge-green">Low Impact</span>
+          <a href="https://www.youtube.com/watch?v=nm7roKZX7Lc" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--primary);margin-left:auto;"><i class="fas fa-external-link-alt"></i> Open in YouTube</a>
+        </div>
+      </div>
+    </div>
+    <div class="yt-card">
+      <div class="yt-thumb" onclick="loadYT(this,'EOf3cGIQpA4')" data-id="EOf3cGIQpA4">
+        <img src="https://img.youtube.com/vi/EOf3cGIQpA4/mqdefault.jpg" alt="Wall Push-Ups" loading="lazy">
+        <div class="yt-play-btn"><i class="fab fa-youtube"></i></div>
+      </div>
+      <div class="yt-iframe-wrap" id="yt-EOf3cGIQpA4"></div>
+      <div class="yt-info">
+        <h4>2. Wall Push-Ups</h4>
+        <p>Gentle upper body strengthening — safe for those with low bone density.</p>
+        <div style="margin-top:.5rem;display:flex;gap:.4rem;align-items:center;">
+          <span class="badge badge-green">Beginner</span>
+          <a href="https://www.youtube.com/watch?v=EOf3cGIQpA4" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--primary);margin-left:auto;"><i class="fas fa-external-link-alt"></i> Open in YouTube</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Exercise tips -->
+  <div class="card">
+    <div class="card-header"><i class="fas fa-lightbulb" style="color:#f6b93b;"></i><h3>Beginner Tips</h3></div>
+    <div class="card-body">
+      <div class="two-col">
+        {% for tip in ['Start with 5–10 minutes per session, build gradually','Always warm up with 3–5 min gentle walking first','Stop immediately if you feel sharp pain','Exercise 3–5 times per week for best results','Stay hydrated — drink water before and after','Use a chair for support if balance is uncertain'] %}
+        <div class="ex-guide-item">
+          <div class="ex-guide-icon" style="background:#dcfce7;color:#15803d;"><i class="fas fa-circle-check"></i></div>
+          <span style="font-size:.83rem;color:var(--text-secondary);">{{ tip }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STRENGTH TRAINING -->
+<div id="tabStr" class="ex-panel">
+  <div class="section-title"><i class="fas fa-fire"></i> Weight-Bearing &amp; Resistance Training</div>
+  <div class="two-col mb-4">
+    <div class="yt-card">
+      <div class="yt-thumb" onclick="loadYT(this,'ZjK4V7DTuSs')" data-id="ZjK4V7DTuSs">
+        <img src="https://img.youtube.com/vi/ZjK4V7DTuSs/mqdefault.jpg" alt="Weight-Bearing Aerobics" loading="lazy">
+        <div class="yt-play-btn"><i class="fab fa-youtube"></i></div>
+      </div>
+      <div class="yt-iframe-wrap" id="yt-ZjK4V7DTuSs"></div>
+      <div class="yt-info">
+        <h4>1. Weight-Bearing Aerobics</h4>
+        <p>Bone-stimulating impact exercises that help maintain and improve bone density.</p>
+        <div style="margin-top:.5rem;display:flex;gap:.4rem;align-items:center;">
+          <span class="badge badge-yellow">Intermediate</span>
+          <a href="https://www.youtube.com/watch?v=ZjK4V7DTuSs" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--primary);margin-left:auto;"><i class="fas fa-external-link-alt"></i> Open in YouTube</a>
+        </div>
+      </div>
+    </div>
+    <div class="yt-card">
+      <div class="yt-thumb" onclick="loadYT(this,'tONvKzIiqqw')" data-id="tONvKzIiqqw">
+        <img src="https://img.youtube.com/vi/tONvKzIiqqw/mqdefault.jpg" alt="Resistance Band Training" loading="lazy">
+        <div class="yt-play-btn"><i class="fab fa-youtube"></i></div>
+      </div>
+      <div class="yt-iframe-wrap" id="yt-tONvKzIiqqw"></div>
+      <div class="yt-info">
+        <h4>2. Resistance Band Training</h4>
+        <p>Build muscle strength and bone density with resistance band workouts.</p>
+        <div style="margin-top:.5rem;display:flex;gap:.4rem;align-items:center;">
+          <span class="badge badge-yellow">Intermediate</span>
+          <a href="https://www.youtube.com/watch?v=tONvKzIiqqw" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--primary);margin-left:auto;"><i class="fas fa-external-link-alt"></i> Open in YouTube</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="two-col mb-4">
+    <div class="yt-card">
+      <div class="yt-thumb" onclick="loadYT(this,'aclHkVaku9U')" data-id="aclHkVaku9U">
+        <img src="https://img.youtube.com/vi/aclHkVaku9U/mqdefault.jpg" alt="Yoga for Bone Health" loading="lazy">
+        <div class="yt-play-btn"><i class="fab fa-youtube"></i></div>
+      </div>
+      <div class="yt-iframe-wrap" id="yt-aclHkVaku9U"></div>
+      <div class="yt-info">
+        <h4>3. Yoga for Bone Health</h4>
+        <p>Weight-bearing yoga poses to improve bone strength, posture, and flexibility.</p>
+        <div style="margin-top:.5rem;display:flex;gap:.4rem;align-items:center;">
+          <span class="badge badge-blue">Yoga</span>
+          <a href="https://www.youtube.com/watch?v=aclHkVaku9U" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--primary);margin-left:auto;"><i class="fas fa-external-link-alt"></i> Open in YouTube</a>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;justify-content:center;padding:1.5rem;gap:1rem;background:linear-gradient(135deg,#eff6ff,#dbeafe);">
+      <div style="font-size:1.5rem;">💪</div>
+      <div style="font-weight:700;color:var(--primary);">Strength Training Benefits</div>
+      <div style="font-size:.82rem;color:var(--text-secondary);line-height:1.7;">
+        ✅ Increases bone mineral density<br>
+        ✅ Reduces fracture risk by 30–40%<br>
+        ✅ Improves muscle mass and balance<br>
+        ✅ Boosts metabolism and energy levels<br>
+        ✅ Reduces fall risk significantly
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FALL PREVENTION -->
+<div id="tabFall" class="ex-panel">
+  <div class="section-title"><i class="fas fa-person-falling-burst"></i> Balance &amp; Fall Prevention</div>
+  <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:.85rem 1.25rem;margin-bottom:1.25rem;font-size:.88rem;color:#b91c1c;">
+    <i class="fas fa-triangle-exclamation"></i> <strong>Critical:</strong> Falls are the leading cause of fractures in osteoporosis patients. These exercises are essential.
+  </div>
+  <div class="two-col mb-4">
+    <div class="yt-card">
+      <div class="yt-thumb" onclick="loadYT(this,'Wv-FQ9Ximow')" data-id="Wv-FQ9Ximow">
+        <img src="https://img.youtube.com/vi/Wv-FQ9Ximow/mqdefault.jpg" alt="Single Leg Balance" loading="lazy">
+        <div class="yt-play-btn"><i class="fab fa-youtube"></i></div>
+      </div>
+      <div class="yt-iframe-wrap" id="yt-Wv-FQ9Ximow"></div>
+      <div class="yt-info">
+        <h4>1. Single Leg Stance</h4>
+        <p>Improves balance and stability — core fall prevention exercise for osteoporosis.</p>
+        <div style="margin-top:.5rem;display:flex;gap:.4rem;align-items:center;">
+          <span class="badge badge-blue">Balance</span>
+          <a href="https://www.youtube.com/watch?v=Wv-FQ9Ximow" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--primary);margin-left:auto;"><i class="fas fa-external-link-alt"></i> Open in YouTube</a>
+        </div>
+      </div>
+    </div>
+    <div class="yt-card">
+      <div class="yt-thumb" onclick="loadYT(this,'VfYMrPLlCqY')" data-id="VfYMrPLlCqY">
+        <img src="https://img.youtube.com/vi/VfYMrPLlCqY/mqdefault.jpg" alt="Tai Chi for Seniors" loading="lazy">
+        <div class="yt-play-btn"><i class="fab fa-youtube"></i></div>
+      </div>
+      <div class="yt-iframe-wrap" id="yt-VfYMrPLlCqY"></div>
+      <div class="yt-info">
+        <h4>2. Tai Chi for Seniors</h4>
+        <p>Slow, gentle movements that improve balance, coordination and reduce fall risk by 47%.</p>
+        <div style="margin-top:.5rem;display:flex;gap:.4rem;align-items:center;">
+          <span class="badge badge-blue">Balance</span>
+          <a href="https://www.youtube.com/watch?v=VfYMrPLlCqY" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--primary);margin-left:auto;"><i class="fas fa-external-link-alt"></i> Open in YouTube</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="two-col mb-4">
+    <div class="yt-card">
+      <div class="yt-thumb" onclick="loadYT(this,'5D8FvdMIE4g')" data-id="5D8FvdMIE4g">
+        <img src="https://img.youtube.com/vi/5D8FvdMIE4g/mqdefault.jpg" alt="Heel-Toe Walking" loading="lazy">
+        <div class="yt-play-btn"><i class="fab fa-youtube"></i></div>
+      </div>
+      <div class="yt-iframe-wrap" id="yt-5D8FvdMIE4g"></div>
+      <div class="yt-info">
+        <h4>3. Heel-Toe Walking</h4>
+        <p>Tandem walking to improve gait stability and reduce fall risk in daily life.</p>
+        <div style="margin-top:.5rem;display:flex;gap:.4rem;align-items:center;">
+          <span class="badge badge-blue">Balance</span>
+          <a href="https://www.youtube.com/watch?v=5D8FvdMIE4g" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--primary);margin-left:auto;"><i class="fas fa-external-link-alt"></i> Open in YouTube</a>
+        </div>
+      </div>
+    </div>
+    <div class="yt-card">
+      <div class="yt-thumb" onclick="loadYT(this,'6I0MDEmVT_E')" data-id="6I0MDEmVT_E">
+        <img src="https://img.youtube.com/vi/6I0MDEmVT_E/mqdefault.jpg" alt="Balance Board Exercise" loading="lazy">
+        <div class="yt-play-btn"><i class="fab fa-youtube"></i></div>
+      </div>
+      <div class="yt-iframe-wrap" id="yt-6I0MDEmVT_E"></div>
+      <div class="yt-info">
+        <h4>4. Chair-Based Balance</h4>
+        <p>Safe seated and standing balance exercises using a chair for support.</p>
+        <div style="margin-top:.5rem;display:flex;gap:.4rem;align-items:center;">
+          <span class="badge badge-green">Safe</span>
+          <a href="https://www.youtube.com/watch?v=6I0MDEmVT_E" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--primary);margin-left:auto;"><i class="fas fa-external-link-alt"></i> Open in YouTube</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><i class="fas fa-home" style="color:var(--primary);"></i><h3>Home Safety Checklist</h3></div>
+    <div class="card-body">
+      <div class="three-col">
+        {% for tip in ['Remove loose rugs and trip hazards from all walkways','Install grab bars in bathroom near toilet and shower','Ensure all rooms are well-lit — use nightlights','Wear non-slip footwear indoors at all times','Keep frequently used items within easy reach','Use walker or cane if recommended by doctor'] %}
+        <div class="ex-guide-item">
+          <div class="ex-guide-icon" style="background:#dcfce7;color:#15803d;"><i class="fas fa-house-circle-check"></i></div>
+          <span style="font-size:.82rem;color:var(--text-secondary);">{{ tip }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXERCISE GUIDE -->
+<div id="tabGuide" class="ex-panel">
+  <div class="section-title"><i class="fas fa-book-open"></i> Osteoporosis Exercise Guide</div>
+  <div class="two-col mb-4">
+    <div class="card">
+      <div class="card-header" style="background:linear-gradient(135deg,#dcfce7,#a7f3d0);"><i class="fas fa-thumbs-up" style="color:#15803d;"></i><h3 style="color:#15803d;">Recommended Exercises</h3></div>
+      <div class="card-body">
+        {% for ex in [('Weight-bearing aerobics','Walking, dancing, step aerobics'),('Resistance training','Free weights, resistance bands, machines'),('Balance exercises','Tai chi, yoga, single-leg stands'),('Impact sports','Tennis, badminton (with doctor OK)'),('Posture exercises','Spine extension, core strengthening')] %}
+        <div class="ex-guide-item" style="margin-bottom:.6rem;">
+          <div class="ex-guide-icon" style="background:#dcfce7;color:#15803d;"><i class="fas fa-check"></i></div>
+          <div>
+            <div style="font-weight:700;font-size:.85rem;color:var(--text-primary);">{{ ex[0] }}</div>
+            <div style="font-size:.78rem;color:var(--text-muted);">{{ ex[1] }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="background:linear-gradient(135deg,#fee2e2,#fecaca);"><i class="fas fa-ban" style="color:#b91c1c;"></i><h3 style="color:#b91c1c;">Avoid These Activities</h3></div>
+      <div class="card-body">
+        {% for ex in [('High-impact sports','Running, jumping jacks on hard surfaces'),('Spine flexion exercises','Sit-ups, toe touches, rowing'),('Heavy weightlifting','Exercises that compress the spine'),('Contact sports','Football, martial arts — fracture risk'),('Swimming only','Good for fitness, doesn\'t build bone')] %}
+        <div class="ex-guide-item" style="margin-bottom:.6rem;">
+          <div class="ex-guide-icon" style="background:#fee2e2;color:#b91c1c;"><i class="fas fa-xmark"></i></div>
+          <div>
+            <div style="font-weight:700;font-size:.85rem;color:var(--text-primary);">{{ ex[0] }}</div>
+            <div style="font-size:.78rem;color:var(--text-muted);">{{ ex[1] }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Frequency guide -->
+  <div class="card">
+    <div class="card-header"><i class="fas fa-calendar-week" style="color:var(--primary);"></i><h3>Weekly Exercise Schedule</h3></div>
+    <div class="card-body">
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead><tr><th>Day</th><th>Exercise Type</th><th>Duration</th><th>Intensity</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Monday</strong></td><td>Weight-bearing aerobics (walking)</td><td>30 min</td><td><span class="badge badge-green">Low</span></td></tr>
+            <tr><td><strong>Tuesday</strong></td><td>Resistance band training</td><td>25 min</td><td><span class="badge badge-yellow">Moderate</span></td></tr>
+            <tr><td><strong>Wednesday</strong></td><td>Balance &amp; Tai Chi</td><td>30 min</td><td><span class="badge badge-green">Low</span></td></tr>
+            <tr><td><strong>Thursday</strong></td><td>Rest or gentle stretching</td><td>15 min</td><td><span class="badge badge-green">Rest</span></td></tr>
+            <tr><td><strong>Friday</strong></td><td>Yoga for bone health</td><td>30 min</td><td><span class="badge badge-green">Low</span></td></tr>
+            <tr><td><strong>Saturday</strong></td><td>Weight-bearing aerobics + strength</td><td>40 min</td><td><span class="badge badge-yellow">Moderate</span></td></tr>
+            <tr><td><strong>Sunday</strong></td><td>Rest &amp; Recovery</td><td>—</td><td><span class="badge" style="background:#f0f4f8;color:var(--text-muted);">Rest</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showExTab(tabId, btn) {
+  // Hide all ex-panels
+  document.querySelectorAll('.ex-panel').forEach(function(p) {
+    p.classList.remove('active');
+    p.style.display = 'none';
+  });
+  // Remove active from all tabs
+  document.querySelectorAll('.ex-tab').forEach(function(b) { b.classList.remove('active'); });
+  // Show selected
+  var panel = document.getElementById(tabId);
+  if (panel) { panel.classList.add('active'); panel.style.display = 'block'; }
+  if (btn) btn.classList.add('active');
+}
+
+// Init panels
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.ex-panel').forEach(function(p) {
+    if (!p.classList.contains('active')) p.style.display = 'none';
+  });
+});
+
+function loadYT(thumbEl, videoId) {
+  // Replace thumbnail with iframe
+  var wrap = document.getElementById('yt-' + videoId);
+  if (!wrap) return;
+  wrap.style.display = 'block';
+  wrap.innerHTML = '<iframe src="https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0" allowfullscreen allow="autoplay; encrypted-media" frameborder="0" style="width:100%;height:100%;border:none;"></iframe>';
+  thumbEl.style.display = 'none';
+}
+</script>
+{% endblock %}

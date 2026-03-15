@@ -1,0 +1,14 @@
+{
+  "profile": {
+    "name": "sowmya",
+    "age": 30,
+    "gender": "Female",
+    "phone": "",
+    "blood_type": "",
+    "role": "doctor",
+    "specialty": "Endocrinology",
+    "hospital": "mru",
+    "license": "12345"
+  },
+  "history": []
+}

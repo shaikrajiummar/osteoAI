@@ -1,0 +1,804 @@
+{% extends "base.html" %}
+{% block title %}Assessment — OsteoAI{% endblock %}
+
+{% block extra_head %}
+<style>
+.analysis-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .8rem;border-radius:50px;font-size:.78rem;font-weight:700;background:rgba(26,111,196,.1);color:var(--primary);border:1px solid rgba(26,111,196,.2);}
+.step-tab{display:flex;align-items:center;gap:.5rem;padding:.65rem 1.1rem;border-radius:10px;cursor:pointer;transition:all .2s;border:2px solid var(--border);background:#fff;font-weight:600;font-size:.82rem;color:var(--text-secondary);}
+.step-tab.active{border-color:var(--primary);background:rgba(26,111,196,.06);color:var(--primary);}
+.step-tab .step-num{width:22px;height:22px;border-radius:50%;background:var(--border);color:var(--text-muted);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;}
+.step-tab.active .step-num{background:var(--primary);color:white;}
+.xray-drop{border:2px dashed var(--primary-light);border-radius:14px;min-height:180px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.6rem;background:rgba(26,111,196,.03);cursor:pointer;transition:all .25s;position:relative;overflow:hidden;}
+.xray-drop:hover{border-color:var(--primary);background:rgba(26,111,196,.07);}
+.result-banner{border-radius:16px;padding:1.5rem;text-align:center;border:2px solid;}
+.result-banner.normal{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-color:#86efac;color:#15803d;}
+.result-banner.osteopenia{background:linear-gradient(135deg,#fffbeb,#fef9c3);border-color:#fbbf24;color:#92400e;}
+.result-banner.osteoporosis{background:linear-gradient(135deg,#fef2f2,#fee2e2);border-color:#fca5a5;color:#b91c1c;}
+.rf-chip{display:inline-flex;align-items:center;gap:.35rem;padding:.3rem .65rem;border-radius:8px;font-size:.76rem;font-weight:600;margin:.2rem;}
+.rf-chip.danger{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;}
+.rf-chip.warning{background:#fffbeb;color:#92400e;border:1px solid #fde68a;}
+.gradcam-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);color:white;font-size:.72rem;padding:.35rem .7rem;font-weight:600;display:flex;align-items:center;gap:.4rem;}
+.section-divider{border:none;border-top:1.5px solid var(--border);margin:1.25rem 0;}
+.pdf-btn{display:inline-flex;align-items:center;gap:.5rem;padding:.55rem 1.1rem;border-radius:10px;background:linear-gradient(135deg,#e53e3e,#b91c1c);color:white;font-weight:700;font-size:.82rem;border:none;cursor:pointer;transition:opacity .2s;text-decoration:none;}
+.pdf-btn:hover{opacity:.88;}
+</style>
+
+<style>
+.meal-tab-btn{padding:.4rem .95rem;border-radius:9px;border:1.5px solid #e2e8f0;background:#fff;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;}
+.meal-tab-btn.active{background:#16a34a;color:#fff;border-color:#16a34a;}
+.meal-tab-btn.nv.active{background:#dc2626;border-color:#dc2626;}
+#chatWidget{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;font-family:Inter,sans-serif;}
+#chatToggle{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#1a6fc4,#1557a0);border:none;color:#fff;font-size:1.35rem;cursor:pointer;box-shadow:0 4px 24px rgba(26,111,196,.45);display:flex;align-items:center;justify-content:center;transition:transform .2s;}
+#chatToggle:hover{transform:scale(1.1);}
+#chatBox{position:absolute;bottom:72px;right:0;width:340px;background:#fff;border-radius:18px;box-shadow:0 8px 40px rgba(0,0,0,.18);display:none;flex-direction:column;overflow:hidden;border:1.5px solid #e2e8f0;max-height:500px;}
+#chatBox.open{display:flex;}
+#chatHead{background:linear-gradient(135deg,#1a6fc4,#1557a0);padding:.8rem 1rem;display:flex;align-items:center;gap:.55rem;color:#fff;flex-shrink:0;}
+#chatHeadText{font-weight:700;font-size:.9rem;}
+#chatHeadSub{font-size:.68rem;opacity:.8;}
+#chatCloseBtn{margin-left:auto;background:none;border:none;color:#fff;cursor:pointer;font-size:1rem;padding:0;}
+#chatSugs{display:flex;flex-wrap:wrap;gap:.3rem;padding:.6rem .8rem .2rem;flex-shrink:0;border-bottom:1px solid #f0f4f8;}
+.chat-sug{background:#eff6ff;color:#1a6fc4;border:1px solid #bfdbfe;border-radius:20px;font-size:.7rem;padding:.22rem .55rem;cursor:pointer;white-space:nowrap;}
+.chat-sug:hover{background:#1a6fc4;color:#fff;}
+#chatMsgs{flex:1;overflow-y:auto;padding:.8rem;display:flex;flex-direction:column;gap:.55rem;}
+.cb{padding:.5rem .8rem;border-radius:13px;font-size:.81rem;line-height:1.5;max-width:88%;word-break:break-word;}
+.cb.user{background:#1a6fc4;color:#fff;align-self:flex-end;border-bottom-right-radius:3px;}
+.cb.bot{background:#f1f5f9;color:#1e293b;align-self:flex-start;border-bottom-left-radius:3px;}
+.cb.typing{background:#f1f5f9;color:#94a3b8;font-style:italic;}
+#chatInputRow{display:flex;gap:.45rem;padding:.6rem .8rem;border-top:1.5px solid #f0f4f8;flex-shrink:0;}
+#chatInput{flex:1;border:1.5px solid #e2e8f0;border-radius:9px;padding:.42rem .65rem;font-size:.81rem;outline:none;font-family:Inter,sans-serif;}
+#chatInput:focus{border-color:#1a6fc4;}
+#chatSend{background:#1a6fc4;color:#fff;border:none;border-radius:9px;padding:.42rem .8rem;cursor:pointer;}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-icon"><i class="fas fa-microscope"></i></div>
+  <div class="page-header-text">
+    <h1>Unified Multimodal Assessment</h1>
+    <p>Patient data + optional X-ray for comprehensive AI-powered bone density diagnosis</p>
+  </div>
+</div>
+
+{% if error %}
+<div class="alert alert-error"><i class="fas fa-exclamation-triangle"></i> {{ error }} <button class="alert-close" onclick="this.parentElement.remove()">×</button></div>
+{% endif %}
+
+<form method="POST" action="{{ url_for('assessment') }}" enctype="multipart/form-data" id="assessmentForm">
+
+<!-- TOP ROW: Patient Form LEFT | X-Ray Upload RIGHT -->
+<div class="col-2-1" style="align-items:start;margin-bottom:1.5rem;">
+
+  <!-- LEFT: Patient form -->
+  <div>
+    <!-- Step tabs -->
+    <div style="display:flex;gap:.4rem;margin-bottom:1.25rem;flex-wrap:wrap;">
+      <div class="step-tab active" onclick="scrollToSection('secDemog')"><span class="step-num">1</span> Demographics</div>
+      <div class="step-tab" onclick="scrollToSection('secBody')"><span class="step-num">2</span> Body Metrics</div>
+      <div class="step-tab" onclick="scrollToSection('secClinical')"><span class="step-num">3</span> Clinical</div>
+      <div class="step-tab" onclick="scrollToSection('secBone')"><span class="step-num">4</span> DEXA</div>
+    </div>
+
+    <!-- 1. Demographics -->
+    <div class="card mb-3" id="secDemog">
+      <div class="card-header"><i class="fas fa-user" style="color:var(--primary);"></i><h3>Demographic Information</h3></div>
+      <div class="card-body">
+        <div class="two-col">
+          <div class="form-group">
+            <label class="form-label">Patient Name</label>
+            <input type="text" name="patient_name" class="form-control" placeholder="Full name" value="{{ (session.get('user_profile') or {}).get('name','') }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gender</label>
+            <select name="gender" class="form-select" id="genderSel" onchange="toggleGender()">
+              <option value="Female">Female</option>
+              <option value="Male">Male</option>
+            </select>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="form-group">
+            <label class="form-label">Age: <span class="range-value" id="age_val">50</span> yrs</label>
+            <input type="range" name="age" id="age" min="18" max="100" value="50">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ethnicity</label>
+            <select name="ethnicity" class="form-select">
+              <option value="white">White / Caucasian</option>
+              <option value="black">Black / African</option>
+              <option value="asian">Asian</option>
+              <option value="hispanic">Hispanic / Latino</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">AI Model</label>
+          <select name="model_name" class="form-select">
+            <option value="best_model">🏆 Best Model (Auto)</option>
+            <option value="random_forest">🌲 Random Forest</option>
+            <option value="logistic_regression">📈 Logistic Regression</option>
+            <option value="svm">🔷 Support Vector Machine</option>
+            <option value="knn">🔵 K-Nearest Neighbors</option>
+            <option value="neural_network">🧠 Neural Network</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Body Measurements -->
+    <div class="card mb-3" id="secBody">
+      <div class="card-header"><i class="fas fa-ruler-vertical" style="color:var(--primary);"></i><h3>Body Measurements</h3></div>
+      <div class="card-body">
+        <div class="two-col">
+          <div class="form-group">
+            <label class="form-label">Weight (kg)</label>
+            <input type="number" name="weight" id="weight" class="form-control" value="70" min="30" max="300" step="0.1" oninput="calcBMI()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Height (cm)</label>
+            <input type="number" name="height" id="height" class="form-control" value="165" min="100" max="250" step="0.1" oninput="calcBMI()">
+          </div>
+        </div>
+        <div id="bmiBox" style="padding:.85rem 1rem;border-radius:10px;background:#f0f4f8;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+          <i class="fas fa-weight-scale" style="color:var(--primary);"></i>
+          <span style="font-size:.88rem;color:var(--text-secondary);">BMI:</span>
+          <strong id="bmiVal" style="font-size:1.1rem;color:var(--primary);">25.7</strong>
+          <span id="bmiCat" style="font-size:.78rem;padding:.2rem .6rem;border-radius:50px;background:#e6f9f0;color:#15803d;font-weight:600;">Normal</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Clinical Factors -->
+    <div class="card mb-3" id="secClinical">
+      <div class="card-header"><i class="fas fa-stethoscope" style="color:var(--primary);"></i><h3>Clinical &amp; Lifestyle Factors</h3></div>
+      <div class="card-body">
+        <div class="two-col">
+          <div>
+            <div class="toggle-wrapper"><span class="toggle-label"><i class="fas fa-smoking"></i> Current Smoker</span>
+              <label class="toggle-switch"><input type="checkbox" name="smoking" value="1"><span class="slider"></span></label></div>
+            <div class="toggle-wrapper"><span class="toggle-label"><i class="fas fa-wine-glass"></i> Alcohol Use</span>
+              <label class="toggle-switch"><input type="checkbox" name="alcohol" value="1"><span class="slider"></span></label></div>
+            <div class="toggle-wrapper"><span class="toggle-label"><i class="fas fa-person-walking"></i> Physical Activity</span>
+              <label class="toggle-switch"><input type="checkbox" name="activity" value="1" checked><span class="slider"></span></label></div>
+            <div class="toggle-wrapper"><span class="toggle-label"><i class="fas fa-droplet"></i> Milk / Dairy Intake</span>
+              <label class="toggle-switch"><input type="checkbox" name="milk" value="1" checked><span class="slider"></span></label></div>
+          </div>
+          <div>
+            <div class="toggle-wrapper"><span class="toggle-label"><i class="fas fa-people-group"></i> Family History</span>
+              <label class="toggle-switch"><input type="checkbox" name="parents_osteoporosis" value="1"><span class="slider"></span></label></div>
+            <div class="toggle-wrapper"><span class="toggle-label"><i class="fas fa-pills"></i> Corticosteroids</span>
+              <label class="toggle-switch"><input type="checkbox" name="corticosteroids" value="1"><span class="slider"></span></label></div>
+            <div class="toggle-wrapper"><span class="toggle-label"><i class="fas fa-joint"></i> Arthritis</span>
+              <label class="toggle-switch"><input type="checkbox" name="arthritis" value="1"><span class="slider"></span></label></div>
+            <div class="toggle-wrapper"><span class="toggle-label"><i class="fas fa-heart-pulse"></i> Chronic Diseases</span>
+              <label class="toggle-switch"><input type="checkbox" name="diseases" value="1"><span class="slider"></span></label></div>
+          </div>
+        </div>
+        <div id="femaleFields" style="margin-top:.4rem;">
+          <div class="toggle-wrapper"><span class="toggle-label"><i class="fas fa-venus"></i> Post-Menopausal</span>
+            <label class="toggle-switch"><input type="checkbox" name="menopause" value="1"><span class="slider"></span></label></div>
+        </div>
+        <div id="maleFields" style="display:none;margin-top:.4rem;">
+          <div class="toggle-wrapper"><span class="toggle-label"><i class="fas fa-mars"></i> Testosterone Deficiency</span>
+            <label class="toggle-switch"><input type="checkbox" name="testosterone" value="1"><span class="slider"></span></label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. DEXA Scores -->
+    <div class="card mb-3" id="secBone">
+      <div class="card-header"><i class="fas fa-bone" style="color:var(--primary);"></i><h3>DEXA Bone Density Scores</h3></div>
+      <div class="card-body">
+        <div class="two-col">
+          <div class="form-group">
+            <label class="form-label">T-Score: <span class="range-value" id="t_val">-1.0</span></label>
+            <input type="range" name="t_score" id="t_score" min="-5" max="5" value="-1" step="0.1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Z-Score: <span class="range-value" id="z_val">-0.5</span></label>
+            <input type="range" name="z_score" id="z_score" min="-5" max="5" value="-0.5" step="0.1">
+          </div>
+        </div>
+        <div style="padding:.7rem 1rem;border-radius:10px;background:#f0fdf4;border:1px solid #86efac;font-size:.78rem;display:flex;gap:1rem;flex-wrap:wrap;">
+          <span style="color:#15803d;font-weight:600;">≥ -1.0 → Normal</span>
+          <span style="color:#92400e;font-weight:600;">-1.0 to -2.5 → Osteopenia</span>
+          <span style="color:#b91c1c;font-weight:600;">≤ -2.5 → Osteoporosis</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-bottom:1.5rem;">
+      <i class="fas fa-magnifying-glass-chart"></i> Run Unified AI Analysis
+    </button>
+  </div>
+
+  <!-- RIGHT: X-Ray Upload (sticky) -->
+  <div>
+    <div class="card" style="position:sticky;top:calc(var(--navbar-h) + 1rem);">
+      <div class="card-header">
+        <i class="fas fa-x-ray" style="color:var(--primary);"></i>
+        <h3>X-Ray Upload <span style="font-size:.73rem;font-weight:500;color:var(--text-muted);">(Optional)</span></h3>
+      </div>
+      <div class="card-body">
+        <div class="xray-drop" id="dropzone" onclick="document.getElementById('xrayFile').click()">
+          <div id="dzPlaceholder" style="text-align:center;">
+            <i class="fas fa-cloud-arrow-up" style="font-size:2.2rem;color:var(--primary-light);margin-bottom:.4rem;display:block;"></i>
+            <p style="color:var(--text-muted);font-size:.85rem;"><strong>Click or drag &amp; drop</strong> X-ray image</p>
+            <p style="color:var(--text-muted);font-size:.73rem;margin-top:.2rem;">JPG / PNG • Enables CNN+MLP fusion</p>
+          </div>
+          <img id="xrayPreviewImg" style="display:none;width:100%;border-radius:10px;" alt="X-ray preview">
+        </div>
+        <div id="xrayInfo" style="display:none;margin-top:.65rem;align-items:center;justify-content:space-between;padding:.5rem .85rem;background:#f0f4f8;border-radius:8px;font-size:.8rem;">
+          <span id="xrayName" style="color:var(--primary);font-weight:600;"></span>
+          <button type="button" onclick="clearXray()" class="btn btn-secondary" style="padding:.25rem .65rem;font-size:.75rem;">
+            <i class="fas fa-times"></i> Remove
+          </button>
+        </div>
+        <input type="file" id="xrayFile" name="xray_image" accept=".jpg,.jpeg,.png" style="display:none;" onchange="previewXray(event)">
+        <div style="margin-top:.85rem;padding:.75rem .9rem;background:rgba(26,111,196,.04);border-radius:10px;border:1px solid rgba(26,111,196,.12);font-size:.8rem;color:var(--text-secondary);">
+          <strong style="color:var(--primary);"><i class="fas fa-brain"></i> With X-Ray:</strong> CNN extracts visual bone density features → fused with MLP for higher accuracy
+        </div>
+
+        {% if result and result.has_xray and xray_file %}
+        <hr style="border-color:var(--border);margin:.85rem 0;">
+        <div style="font-weight:700;font-size:.83rem;margin-bottom:.65rem;color:var(--text-primary);"><i class="fas fa-images" style="color:var(--primary);"></i> Scan Analysis</div>
+        <div style="position:relative;border-radius:10px;overflow:hidden;margin-bottom:.6rem;">
+          <img src="{{ url_for('serve_upload', filename=xray_file) }}" style="width:100%;border-radius:10px;" alt="Uploaded X-ray">
+          <div class="gradcam-label"><i class="fas fa-image"></i> Original Scan</div>
+        </div>
+        {% if gradcam_file %}
+        <div style="position:relative;border-radius:10px;overflow:hidden;">
+          <img src="{{ url_for('serve_upload', filename=gradcam_file) }}" style="width:100%;border-radius:10px;" alt="Grad-CAM heatmap">
+          <div class="gradcam-label" style="background:rgba(120,0,180,.6);"><i class="fas fa-fire"></i> Grad-CAM Heatmap</div>
+        </div>
+        {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div><!-- end top row -->
+
+<!-- BOTTOM: Full-width Results -->
+{% if result %}
+<div class="card mb-3" id="resultsSection">
+  <div class="card-header">
+    <i class="fas fa-chart-pie" style="color:var(--primary);"></i>
+    <h3>Analysis Result</h3>
+    <span class="analysis-badge" style="margin-left:auto;">{{ result.analysis_mode }}</span>
+    <!-- PDF Download Button -->
+    <button type="button" class="pdf-btn" onclick="downloadPDF()" style="margin-left:.75rem;">
+      <i class="fas fa-file-pdf"></i> Download PDF Report
+    </button>
+  </div>
+  <div class="card-body" id="reportContent">
+
+    <!-- Row: diagnosis left | charts+xray right -->
+    <div class="col-2-1" style="align-items:start;gap:1.5rem;">
+
+      <!-- LEFT: Diagnosis + patient info + risk factors + recommendations -->
+      <div>
+        <!-- Result banner -->
+        <div class="result-banner {{ result.prediction.lower().replace(' ','') }}">
+          <div style="font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;opacity:.7;margin-bottom:.3rem;">AI Diagnosis</div>
+          <div style="font-size:2.2rem;font-weight:900;line-height:1;">{{ result.prediction }}</div>
+          <div style="font-size:.85rem;opacity:.75;margin:.25rem 0 .65rem;">Confidence: <strong>{{ result.confidence }}%</strong></div>
+          <div style="height:7px;background:rgba(0,0,0,.12);border-radius:4px;overflow:hidden;">
+            <div style="height:100%;width:{{ result.confidence }}%;background:currentColor;border-radius:4px;"></div>
+          </div>
+        </div>
+
+        <!-- Patient chips -->
+        <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin:1rem 0;font-size:.8rem;">
+          <span style="padding:.28rem .65rem;background:#f0f4f8;border-radius:8px;"><strong>Patient:</strong> {{ result.patient_name }}</span>
+          <span style="padding:.28rem .65rem;background:#f0f4f8;border-radius:8px;"><strong>Age:</strong> {{ result.age }}</span>
+          <span style="padding:.28rem .65rem;background:#f0f4f8;border-radius:8px;"><strong>BMI:</strong> {{ result.bmi }}</span>
+          <span style="padding:.28rem .65rem;background:#f0f4f8;border-radius:8px;"><strong>T-Score:</strong> {{ result.t_score }}</span>
+          <span style="padding:.28rem .65rem;background:#f0f4f8;border-radius:8px;"><strong>Gender:</strong> {{ result.gender }}</span>
+        </div>
+
+        <!-- Risk factors -->
+        {% if result.risk_factors %}
+        <div style="margin-bottom:1rem;">
+          <div style="font-weight:700;font-size:.82rem;margin-bottom:.45rem;color:var(--text-primary);">
+            <i class="fas fa-triangle-exclamation" style="color:#f6b93b;"></i> Risk Factors Identified
+          </div>
+          {% for rf in result.risk_factors %}
+          <span class="rf-chip {{ rf[2] }}"><i class="{{ rf[1] }}"></i> {{ rf[0] }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <hr class="section-divider">
+
+        <!-- Recommendations -->
+        <div style="font-weight:700;font-size:.85rem;margin-bottom:.5rem;color:var(--text-primary);">
+          <i class="fas fa-lightbulb" style="color:#f6b93b;"></i> Clinical Recommendations
+        </div>
+        {% if result.prediction == 'Osteoporosis' %}
+        <ul style="font-size:.82rem;color:var(--text-secondary);padding-left:1.2rem;line-height:2.1;">
+          <li>🏥 Consult an endocrinologist immediately</li>
+          <li>💊 Consider bisphosphonate therapy (e.g. Alendronate)</li>
+          <li>🥛 Calcium 1200mg + Vitamin D3 800IU daily</li>
+          <li>🧘 Tai Chi &amp; balance exercises to prevent falls</li>
+          <li>🔬 Follow-up DEXA scan in 6 months</li>
+        </ul>
+        {% elif result.prediction == 'Osteopenia' %}
+        <ul style="font-size:.82rem;color:var(--text-secondary);padding-left:1.2rem;line-height:2.1;">
+          <li>📅 Schedule follow-up DEXA scan in 1 year</li>
+          <li>🥛 Increase calcium (1000mg) and Vitamin D</li>
+          <li>🏋️ Start weight-bearing exercise program</li>
+          <li>🚭 Reduce alcohol and smoking immediately</li>
+          <li>🩺 Monitor T-score progression closely</li>
+        </ul>
+        {% else %}
+        <ul style="font-size:.82rem;color:var(--text-secondary);padding-left:1.2rem;line-height:2.1;">
+          <li>✅ Maintain healthy lifestyle habits</li>
+          <li>🏃 Regular weight-bearing exercise</li>
+          <li>🥛 Adequate calcium (1000mg/day) and Vitamin D</li>
+          <li>📅 Annual bone density check recommended</li>
+        </ul>
+        {% endif %}
+      </div>
+
+      <!-- RIGHT: Plotly charts -->
+      <div>
+        <div style="font-weight:700;font-size:.83rem;margin-bottom:.6rem;color:var(--text-primary);">
+          <i class="fas fa-chart-bar" style="color:var(--primary);"></i> Risk Visualizations
+        </div>
+        <!-- Chart 1: Confidence Gauge -->
+        <div id="gaugeChart" style="width:100%;height:200px;"></div>
+        <!-- Chart 2: Radar -->
+        <div id="radarChart" style="width:100%;height:210px;margin-top:.25rem;"></div>
+      </div>
+
+    </div><!-- end col-2-1 results -->
+
+    <!-- FULL WIDTH: 2 extra graphs -->
+    <hr class="section-divider">
+    <div style="font-weight:700;font-size:.85rem;margin-bottom:.75rem;color:var(--text-primary);">
+      <i class="fas fa-chart-column" style="color:var(--primary);"></i> Detailed Analysis Charts
+    </div>
+    <div class="two-col" style="gap:1.25rem;">
+      <!-- Chart 3: Risk Factor Bar Chart -->
+      <div>
+        <div style="font-size:.78rem;font-weight:700;color:var(--text-secondary);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.5px;">
+          <i class="fas fa-triangle-exclamation" style="color:#f6b93b;"></i> Risk Factor Impact Score
+        </div>
+        <div id="barChart" style="width:100%;height:240px;"></div>
+      </div>
+      <!-- Chart 4: Bone Density T-Score Comparison -->
+      <div>
+        <div style="font-size:.78rem;font-weight:700;color:var(--text-secondary);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.5px;">
+          <i class="fas fa-bone" style="color:var(--primary);"></i> T-Score vs Reference Ranges
+        </div>
+        <div id="tscoreChart" style="width:100%;height:240px;"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% else %}
+<!-- Empty state -->
+<div class="card">
+  <div class="card-body" style="text-align:center;padding:2.5rem 1rem;">
+    <div style="width:72px;height:72px;border-radius:18px;background:linear-gradient(135deg,rgba(26,111,196,.1),rgba(26,111,196,.05));display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.8rem;color:var(--primary-light);">
+      <i class="fas fa-microscope"></i>
+    </div>
+    <h3 style="font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:.4rem;">Ready for Analysis</h3>
+    <p style="font-size:.84rem;color:var(--text-muted);line-height:1.65;">
+      Fill in patient details on the left. Upload an X-ray on the right for multimodal CNN+MLP analysis.<br>
+      Click <strong>Run Unified AI Analysis</strong> to begin.
+    </p>
+    <div style="margin-top:1.25rem;display:flex;gap:.65rem;justify-content:center;flex-wrap:wrap;font-size:.8rem;">
+      <div style="padding:.6rem .9rem;background:#f0fdf4;border-radius:8px;color:#15803d;"><i class="fas fa-table"></i> <strong>Tabular:</strong> Demographics + T-Score → ML</div>
+      <div style="padding:.6rem .9rem;background:#eff6ff;border-radius:8px;color:var(--primary);"><i class="fas fa-x-ray"></i> <strong>+ X-Ray:</strong> CNN+MLP fusion → higher accuracy</div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if result %}
+<!-- ══ NUTRITION PLAN ══════════════════════════════════════════════════ -->
+<div class="card mb-3">
+  <div class="card-header" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-bottom:2px solid #86efac;">
+    <i class="fas fa-utensils" style="color:#16a34a;font-size:1.05rem;"></i>
+    <h3 style="color:#15803d;">Personalised Meal Plan</h3>
+    <div style="margin-left:auto;display:flex;gap:.5rem;">
+      <button class="meal-tab-btn active" id="btnVeg" onclick="switchMeal(this,true)"><i class="fas fa-leaf"></i> Vegetarian</button>
+      <button class="meal-tab-btn nv" id="btnNV"  onclick="switchMeal(this,false)"><i class="fas fa-drumstick-bite"></i> Non-Veg</button>
+    </div>
+  </div>
+  <div class="card-body">
+    <div id="vegPlan">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+        {% for slot,items in result.veg_meals.items() %}
+        <div style="background:#f0fdf4;border-radius:11px;padding:.9rem;border:1.5px solid #bbf7d0;">
+          <div style="font-weight:800;font-size:.78rem;text-transform:uppercase;color:#15803d;letter-spacing:.5px;margin-bottom:.5rem;">
+            <i class="fas fa-{% if slot=='breakfast' %}sun{% elif slot=='lunch' %}cloud-sun{% elif slot=='dinner' %}moon{% else %}apple-whole{% endif %}"></i> {{ slot.title() }}
+          </div>
+          {% for item in items %}
+          <div style="padding:.25rem 0;border-bottom:1px solid #d1fae5;font-size:.8rem;color:#065f46;display:flex;gap:.3rem;align-items:flex-start;">
+            <i class="fas fa-check-circle" style="color:#16a34a;margin-top:.1rem;flex-shrink:0;font-size:.7rem;"></i>{{ item }}
+          </div>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+      <p style="font-size:.76rem;color:#065f46;background:#ecfdf5;padding:.6rem .8rem;border-radius:9px;margin-top:.75rem;">
+        <i class="fas fa-circle-info"></i> <strong>Tip:</strong> Aim for 1000–1200 mg calcium daily. Pair with Vitamin D for better absorption.
+      </p>
+    </div>
+    <div id="nvPlan" style="display:none;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+        {% for slot,items in result.nonveg_meals.items() %}
+        <div style="background:#fff7f7;border-radius:11px;padding:.9rem;border:1.5px solid #fecaca;">
+          <div style="font-weight:800;font-size:.78rem;text-transform:uppercase;color:#b91c1c;letter-spacing:.5px;margin-bottom:.5rem;">
+            <i class="fas fa-{% if slot=='breakfast' %}sun{% elif slot=='lunch' %}cloud-sun{% elif slot=='dinner' %}moon{% else %}apple-whole{% endif %}"></i> {{ slot.title() }}
+          </div>
+          {% for item in items %}
+          <div style="padding:.25rem 0;border-bottom:1px solid #fee2e2;font-size:.8rem;color:#7f1d1d;display:flex;gap:.3rem;align-items:flex-start;">
+            <i class="fas fa-check-circle" style="color:#dc2626;margin-top:.1rem;flex-shrink:0;font-size:.7rem;"></i>{{ item }}
+          </div>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+      <p style="font-size:.76rem;color:#7f1d1d;background:#fff7f7;padding:.6rem .8rem;border-radius:9px;margin-top:.75rem;">
+        <i class="fas fa-circle-info"></i> <strong>Tip:</strong> Fish (sardines, salmon) and eggs are excellent bone-friendly choices rich in Vitamin D.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EXERCISE RECOMMENDATIONS ══════════════════════════════════════ -->
+<div class="card mb-3">
+  <div class="card-header" style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border-bottom:2px solid #93c5fd;">
+    <i class="fas fa-dumbbell" style="color:#1d4ed8;font-size:1.05rem;"></i>
+    <h3 style="color:#1e40af;">Exercise Recommendations</h3>
+    <span style="margin-left:auto;font-size:.72rem;color:#3b82f6;background:#dbeafe;padding:.2rem .65rem;border-radius:20px;font-weight:700;">For {{ result.prediction }}</span>
+  </div>
+  <div class="card-body">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;">
+      {% for ex in result.exercises %}
+      <div style="background:#eff6ff;border-radius:11px;padding:1rem;border:1.5px solid #bfdbfe;">
+        <div style="font-weight:800;font-size:.85rem;color:#1e40af;margin-bottom:.25rem;">
+          <i class="fas {{ ex.icon }} " style="color:#3b82f6;"></i> {{ ex.name }}
+        </div>
+        <div style="font-size:.76rem;color:#3730a3;margin-bottom:.65rem;">
+          <i class="fas fa-clock"></i> {{ ex.freq }}
+        </div>
+        <a href="{{ ex.yt }}" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:.35rem;background:#dc2626;color:#fff;padding:.32rem .7rem;border-radius:7px;font-size:.73rem;font-weight:700;text-decoration:none;">
+          <i class="fab fa-youtube"></i> Watch Tutorial
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+    <p style="font-size:.76rem;color:#1e3a8a;background:#eff6ff;padding:.6rem .8rem;border-radius:9px;margin-top:.75rem;">
+      <i class="fas fa-triangle-exclamation" style="color:#f59e0b;"></i>
+      <strong>Safety note:</strong> Always warm up first. For severe osteoporosis, avoid high-impact exercises. Consult a physiotherapist before starting.
+    </p>
+  </div>
+</div>
+{% endif %}
+
+</form>
+{% endblock %}
+
+{% block scripts %}
+{% if result %}
+<script>
+// Gauge chart
+(function(){
+  var pred = "{{ result.prediction }}";
+  var conf = {{ result.confidence }};
+  var color = pred==='Normal'?'#06c270':pred==='Osteopenia'?'#f6b93b':'#e53e3e';
+  Plotly.newPlot('gaugeChart',[{
+    type:'indicator',mode:'gauge+number',value:conf,
+    title:{text:pred+' — Confidence',font:{size:13}},
+    gauge:{axis:{range:[0,100]},bar:{color:color},
+      steps:[{range:[0,40],color:'#fee2e2'},{range:[40,70],color:'#fef9c3'},{range:[70,100],color:'#dcfce7'}],
+      threshold:{line:{color:color,width:4},thickness:.75,value:conf}}
+  }],{margin:{t:40,b:10,l:20,r:20},height:200,paper_bgcolor:'rgba(0,0,0,0)',
+    font:{family:'Inter,sans-serif',size:11}},{displayModeBar:false,responsive:true});
+})();
+
+// Radar chart
+(function(){
+  var age_r = Math.min({{ result.age }}/80,1)*100;
+  var bmi_r = {{ result.bmi }}<18.5?90:{{ result.bmi }}>30?70:30;
+  var ts_r  = {{ result.t_score }}<=-2.5?100:{{ result.t_score }}<=-1?60:20;
+  var sm = {% for rf in result.risk_factors %}{% if 'Smoker' in rf[0] %}80{% endif %}{% endfor %}0;
+  var fh = {% for rf in result.risk_factors %}{% if 'Family' in rf[0] %}80{% endif %}{% endfor %}0;
+  Plotly.newPlot('radarChart',[{
+    type:'scatterpolar',fill:'toself',
+    r:[age_r,bmi_r,ts_r,sm,fh,age_r],
+    theta:['Age Risk','BMI Risk','T-Score','Smoking','Family Hx','Age Risk'],
+    fillcolor:'rgba(26,111,196,0.15)',line:{color:'#1a6fc4',width:2}
+  }],{
+    polar:{radialaxis:{visible:true,range:[0,100]}},showlegend:false,
+    margin:{t:20,b:20,l:30,r:30},height:220,paper_bgcolor:'rgba(0,0,0,0)',
+    font:{family:'Inter,sans-serif',size:10}
+  },{displayModeBar:false,responsive:true});
+})();
+
+// Chart 3: Risk Factor Bar Chart
+(function(){
+  var rfs = [
+    {% for rf in result.risk_factors %}
+    { label: '{{ rf[0] }}', severity: '{{ rf[2] }}' },
+    {% endfor %}
+  ];
+  var labels = rfs.map(function(r){ return r.label; });
+  var values = rfs.map(function(r){ return r.severity === 'danger' ? 85 : 55; });
+  var colors = rfs.map(function(r){ return r.severity === 'danger' ? '#e53e3e' : '#f6b93b'; });
+
+  // Add baseline factors always shown
+  labels = labels.concat(['Age ({{ result.age }}yr)', 'BMI ({{ result.bmi }})']);
+  var agePct = Math.min({{ result.age }}/80*100, 100);
+  var bmiPct = {{ result.bmi }}<18.5?80:{{ result.bmi }}>30?70:30;
+  values = values.concat([Math.round(agePct), bmiPct]);
+  colors = colors.concat(['#1a6fc4','#7c3aed']);
+
+  if(labels.length === 0){ labels=['No risk factors']; values=[10]; colors=['#06c270']; }
+
+  Plotly.newPlot('barChart',[{
+    type:'bar', orientation:'h',
+    y: labels, x: values,
+    marker:{ color: colors },
+    text: values.map(function(v){ return v+'%'; }),
+    textposition:'outside'
+  }],{
+    margin:{t:10,b:30,l:130,r:50},
+    height:240, paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
+    xaxis:{range:[0,120],showgrid:true,gridcolor:'#f0f4f8',ticksuffix:'%'},
+    yaxis:{automargin:true},
+    font:{family:'Inter,sans-serif',size:11}
+  },{displayModeBar:false,responsive:true});
+})();
+
+// Chart 4: T-Score Comparison Bar
+(function(){
+  var ts = {{ result.t_score }};
+  var zones = [
+    {name:'Osteoporosis Zone', min:-5, max:-2.5, color:'rgba(239,68,68,0.25)'},
+    {name:'Osteopenia Zone',   min:-2.5, max:-1,  color:'rgba(245,158,11,0.25)'},
+    {name:'Normal Zone',       min:-1,   max:3,   color:'rgba(22,163,74,0.15)'},
+  ];
+
+  var shapes = zones.map(function(z){
+    return {type:'rect',xref:'x',yref:'paper',
+      x0:z.min,x1:z.max,y0:0,y1:1,
+      fillcolor:z.color,line:{width:0}};
+  });
+
+  Plotly.newPlot('tscoreChart',[
+    {
+      type:'scatter', mode:'markers+text',
+      x:[ts], y:['Your T-Score'],
+      marker:{size:18, color: ts<=-2.5?'#e53e3e': ts<=-1?'#f6b93b':'#06c270',
+              line:{color:'white',width:2}},
+      text:['T = '+ts.toFixed(1)], textposition:'top center',
+      textfont:{size:12,color:'#1e293b',family:'Inter,sans-serif'}
+    },
+    {
+      type:'scatter',mode:'text',
+      x:[-3.75,-1.75,1.0], y:['Your T-Score','Your T-Score','Your T-Score'],
+      text:['<b>Osteoporosis</b>','<b>Osteopenia</b>','<b>Normal</b>'],
+      textfont:{size:10,color:['#b91c1c','#92400e','#15803d']},
+      showlegend:false
+    }
+  ],{
+    shapes:shapes,
+    xaxis:{range:[-5,3],title:'T-Score',zeroline:true,zerolinecolor:'#cbd5e1',
+           tickvals:[-5,-4,-3,-2.5,-2,-1.5,-1,0,1,2,3]},
+    yaxis:{visible:false},
+    margin:{t:20,b:50,l:20,r:20},
+    height:240,paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(248,250,252,1)',
+    font:{family:'Inter,sans-serif',size:11},
+    showlegend:false
+  },{displayModeBar:false,responsive:true});
+})();
+
+// PDF: POST to server route → download real FPDF2 PDF
+function downloadPDF(){
+  var btn = document.querySelector('.pdf-btn');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+  btn.disabled = true;
+
+  // Collect the actual displayed image src values
+  var payload = {
+    patient_name:  '{{ result.patient_name }}',
+    age:           {{ result.age }},
+    gender:        '{{ result.gender }}',
+    bmi:           {{ result.bmi }},
+    t_score:       {{ result.t_score }},
+    z_score:       {{ result.z_score }},
+    prediction:    '{{ result.prediction }}',
+    confidence:    {{ result.confidence }},
+    analysis_mode: '{{ result.analysis_mode }}',
+    risk_factors:  [{% for rf in result.risk_factors %}['{{ rf[0] }}','{{ rf[1] }}','{{ rf[2] }}'],{% endfor %}],
+    xray_file:     '{% if xray_file %}{{ xray_file }}{% endif %}',
+    gradcam_file:  '{% if gradcam_file %}{{ gradcam_file }}{% endif %}',
+    veg_meals:     {{ result.veg_meals | tojson }},
+    nonveg_meals:  {{ result.nonveg_meals | tojson }},
+    exercises:     {{ result.exercises | tojson }}
+  };
+
+  fetch('{{ url_for("generate_pdf") }}', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  })
+  .then(function(r){
+    if(!r.ok) return r.json().then(function(e){ throw new Error(e.error || 'Server error '+r.status); });
+    return r.blob();
+  })
+  .then(function(blob){
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'OsteoAI_Report_{{ result.patient_name|replace(" ","_") }}.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    btn.innerHTML = '<i class="fas fa-file-pdf"></i> Download PDF Report';
+    btn.disabled = false;
+  })
+  .catch(function(err){
+    alert('PDF generation failed.\n\nMake sure fpdf2 is installed:\npip install fpdf2\n\nError: ' + err.message);
+    btn.innerHTML = '<i class="fas fa-file-pdf"></i> Download PDF Report';
+    btn.disabled = false;
+  });
+}
+</script>
+{% endif %}
+<script>
+function calcBMI(){
+  var w=parseFloat(document.getElementById('weight').value)||70;
+  var h=parseFloat(document.getElementById('height').value)||165;
+  var b=w/((h/100)**2);
+  document.getElementById('bmiVal').textContent=b.toFixed(1);
+  var cat='Normal',col='#15803d',bg='#e6f9f0';
+  if(b<18.5){cat='Underweight';col='#1a6fc4';bg='#dbeafe';}
+  else if(b>=25&&b<30){cat='Overweight';col='#b45309';bg='#fef9c3';}
+  else if(b>=30){cat='Obese';col='#b91c1c';bg='#fee2e2';}
+  var c=document.getElementById('bmiCat');
+  c.textContent=cat;c.style.background=bg;c.style.color=col;
+}
+function toggleGender(){
+  var f=document.getElementById('genderSel').value==='Female';
+  document.getElementById('femaleFields').style.display=f?'':'none';
+  document.getElementById('maleFields').style.display=f?'none':'';
+}
+[['age','age_val',0],['t_score','t_val',1],['z_score','z_val',1]].forEach(function(a){
+  var el=document.getElementById(a[0]); if(!el) return;
+  var out=document.getElementById(a[1]); if(!out) return;
+  el.addEventListener('input',function(){out.textContent=parseFloat(el.value).toFixed(a[2]);});
+});
+function previewXray(e){
+  var file=e.target.files[0]; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var img=document.getElementById('xrayPreviewImg');
+    img.src=ev.target.result; img.style.display='block';
+    document.getElementById('dzPlaceholder').style.display='none';
+    var info=document.getElementById('xrayInfo');
+    info.style.display='flex';
+    document.getElementById('xrayName').textContent=file.name;
+    document.getElementById('dropzone').style.minHeight='auto';
+  };
+  reader.readAsDataURL(file);
+}
+function clearXray(){
+  document.getElementById('xrayFile').value='';
+  document.getElementById('xrayPreviewImg').style.display='none';
+  document.getElementById('dzPlaceholder').style.display='block';
+  document.getElementById('xrayInfo').style.display='none';
+  document.getElementById('dropzone').style.minHeight='180px';
+}
+function scrollToSection(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});}
+var dz=document.getElementById('dropzone');
+dz.addEventListener('dragover',function(e){e.preventDefault();dz.style.borderColor='var(--primary)';});
+dz.addEventListener('dragleave',function(){dz.style.borderColor='';});
+dz.addEventListener('drop',function(e){
+  e.preventDefault(); dz.style.borderColor='';
+  var f=e.dataTransfer.files[0]; if(!f) return;
+  var dt=new DataTransfer(); dt.items.add(f);
+  document.getElementById('xrayFile').files=dt.files;
+  previewXray({target:document.getElementById('xrayFile')});
+});
+calcBMI();
+</script>
+
+<!-- ══ FLOATING AI CHATBOT ══════════════════════════════════════════ -->
+<div id="chatWidget">
+  <button id="chatToggle" onclick="toggleChat()" title="Ask AI about bone health">
+    <i class="fas fa-comment-medical" id="chatIco"></i>
+  </button>
+  <div id="chatBox">
+    <div id="chatHead">
+      <i class="fas fa-robot" style="font-size:1.1rem;"></i>
+      <div>
+        <div id="chatHeadText">OsteoAI Assistant</div>
+        <div id="chatHeadSub">Bone health expert · Ask me anything</div>
+      </div>
+      <button id="chatCloseBtn" onclick="toggleChat()"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="chatSugs">
+      <button class="chat-sug" onclick="sugClick(this)">What is osteoporosis?</button>
+      <button class="chat-sug" onclick="sugClick(this)">Calcium-rich foods?</button>
+      <button class="chat-sug" onclick="sugClick(this)">Best exercises for bones?</button>
+      <button class="chat-sug" onclick="sugClick(this)">What does T-score mean?</button>
+      <button class="chat-sug" onclick="sugClick(this)">How to prevent bone loss?</button>
+    </div>
+    <div id="chatMsgs">
+      <div class="cb bot">👋 Hi! I am OsteoAI — your bone health assistant. I can answer questions about osteoporosis, calcium, exercises, T-scores, and treatments!</div>
+    </div>
+    <div id="chatInputRow">
+      <input id="chatInput" type="text" placeholder="Ask about bone health..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button id="chatSend" onclick="sendMsg()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Meal tab switcher
+function switchMeal(btn, isVeg) {
+  document.getElementById('btnVeg').classList.toggle('active', isVeg);
+  document.getElementById('btnNV').classList.toggle('active', !isVeg);
+  document.getElementById('vegPlan').style.display = isVeg ? '' : 'none';
+  document.getElementById('nvPlan').style.display  = isVeg ? 'none' : '';
+}
+
+// Chatbot
+let chatOpen = false, chatHist = [];
+function toggleChat() {
+  chatOpen = !chatOpen;
+  document.getElementById('chatBox').classList.toggle('open', chatOpen);
+  document.getElementById('chatIco').className = chatOpen ? 'fas fa-times' : 'fas fa-comment-medical';
+  if (chatOpen) document.getElementById('chatInput').focus();
+}
+function sugClick(btn) {
+  document.getElementById('chatInput').value = btn.textContent;
+  document.getElementById('chatSugs').style.display = 'none';
+  sendMsg();
+}
+function addBubble(txt, cls) {
+  const el = document.createElement('div');
+  el.className = 'cb ' + cls;
+  el.textContent = txt;
+  const m = document.getElementById('chatMsgs');
+  m.appendChild(el);
+  m.scrollTop = m.scrollHeight;
+  return el;
+}
+async function sendMsg() {
+  const inp = document.getElementById('chatInput');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+  addBubble(msg, 'user');
+  chatHist.push({role:'user', content:msg});
+  const typing = addBubble('Thinking...', 'bot typing');
+  try {
+    const r = await fetch('/api/ai-chat', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({message:msg, history:chatHist.slice(-6)})
+    });
+    const d = await r.json();
+    typing.className = 'cb bot';
+    typing.textContent = d.reply || d.error || 'Sorry, no response.';
+    chatHist.push({role:'assistant', content: d.reply||''});
+  } catch(e) {
+    typing.className = 'cb bot';
+    typing.textContent = 'Network error. Please try again.';
+  }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,14 @@
+{
+  "profile": {
+    "name": "kumm",
+    "age": 30,
+    "gender": "Male",
+    "phone": "",
+    "blood_type": "O-",
+    "role": "patient",
+    "specialty": "",
+    "hospital": "",
+    "license": ""
+  },
+  "history": []
+}

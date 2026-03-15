@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Specialist Locator — OsteoAI{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-header-icon" style="background:linear-gradient(135deg,#06c270,#04a55d);"><i class="fas fa-hospital"></i></div>
+  <div class="page-header-text">
+    <h1>Bone Specialist Locator</h1>
+    <p>Find top-rated osteoporosis specialists and bone health clinics near you</p>
+  </div>
+</div>
+
+<div class="col-2-1" style="align-items:start;">
+  <!-- Map -->
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-map" style="color:var(--secondary);"></i>
+      <h3>Interactive Map</h3>
+      <div style="margin-left:auto;display:flex;gap:.5rem;flex-wrap:wrap;">
+        <select id="cityFilter" class="form-select" style="font-size:.78rem;padding:.3rem .65rem;width:auto;" onchange="filterMap()">
+          <option value="">All Cities</option>
+        </select>
+        <select id="typeFilter" class="form-select" style="font-size:.78rem;padding:.3rem .65rem;width:auto;" onchange="filterMap()">
+          <option value="">All Specialties</option>
+          <option>Endocrinology</option><option>Orthopedic</option><option>Rheumatology</option><option>General</option>
+        </select>
+      </div>
+    </div>
+    <div id="map"></div>
+  </div>
+
+  <!-- Clinics list -->
+  <div>
+    <div style="font-size:.82rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.75rem;">
+      Clinics (<span id="clinicCount">0</span>)
+    </div>
+    <div id="clinicList" style="display:flex;flex-direction:column;gap:.6rem;max-height:600px;overflow-y:auto;"></div>
+
+    <div class="card" style="margin-top:1rem;">
+      <div class="card-header"><i class="fas fa-circle-info" style="color:var(--primary);"></i><h3>Map Legend</h3></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:.4rem;">
+        {% for label,color in [('Endocrinology','#06c270'),('Orthopedic','#e53e3e'),('Rheumatology','#7c3aed'),('General','#f6b93b')] %}
+        <div style="display:flex;align-items:center;gap:.6rem;font-size:.83rem;">
+          <div style="width:14px;height:14px;border-radius:50%;background:{{ color }};flex-shrink:0;"></div>
+          <span style="color:var(--text-secondary);">{{ label }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const clinics = {{ clinics|safe }};
+const typeColors = {
+  'Endocrinology': '#06c270', 'Orthopedic': '#e53e3e',
+  'Rheumatology': '#7c3aed', 'General': '#f6b93b'
+};
+
+// Populate city filter
+const cities = [...new Set(clinics.map(c=>c.city))];
+const cf = document.getElementById('cityFilter');
+cities.forEach(city=>{ const o=document.createElement('option'); o.value=city; o.textContent=city; cf.appendChild(o); });
+
+// Init map
+const map = L.map('map').setView([20.5937, 78.9629], 5);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
+
+let markers = [];
+
+function createIcon(color) {
+  return L.divIcon({
+    html: `<div style="width:16px;height:16px;border-radius:50%;background:${color};border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,.4);"></div>`,
+    className: '', iconSize: [16,16], iconAnchor: [8,8]
+  });
+}
+
+function renderClinics(data) {
+  // Remove old markers
+  markers.forEach(m=>map.removeLayer(m)); markers=[];
+  document.getElementById('clinicList').innerHTML='';
+  document.getElementById('clinicCount').textContent = data.length;
+
+  data.forEach((c,i) => {
+    const color = typeColors[c.type]||'#1a6fc4';
+    const marker = L.marker([c.lat,c.lon],{icon:createIcon(color)}).addTo(map);
+    marker.bindPopup(`
+      <div style="font-family:Inter,sans-serif;min-width:200px;">
+        <div style="font-weight:800;font-size:.9rem;color:#1a202c;margin-bottom:.3rem;">${c.name}</div>
+        <div style="font-size:.78rem;color:#4a5568;margin-bottom:.2rem;"><b>Type:</b> <span style="color:${color};">${c.type}</span></div>
+        <div style="font-size:.78rem;color:#4a5568;margin-bottom:.2rem;"><b>Address:</b> ${c.address}</div>
+        <div style="font-size:.78rem;color:#4a5568;margin-bottom:.5rem;"><b>Phone:</b> <a href="tel:${c.phone}" style="color:#1a6fc4;">${c.phone}</a></div>
+        <div style="font-size:.78rem;margin-bottom:.5rem;">⭐ ${c.rating}/5.0</div>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lon}" target="_blank"
+           style="display:inline-block;padding:.35rem .75rem;background:#1a6fc4;color:white;border-radius:7px;font-size:.75rem;font-weight:700;text-decoration:none;">
+           🗺️ Get Directions
+        </a>
+      </div>`);
+    markers.push(marker);
+
+    // Sidebar card
+    const stars = '⭐'.repeat(Math.round(c.rating));
+    const card = document.createElement('div');
+    card.style.cssText = 'background:white;border:1.5px solid #e2e8f0;border-radius:12px;padding:.85rem;cursor:pointer;transition:all .2s;';
+    card.innerHTML = `
+      <div style="display:flex;gap:.75rem;align-items:flex-start;">
+        <div style="width:10px;height:10px;border-radius:50%;background:${color};margin-top:.3rem;flex-shrink:0;"></div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:.88rem;color:#1a202c;">${c.name}</div>
+          <div style="font-size:.76rem;color:#718096;margin-top:.15rem;">${c.address}</div>
+          <div style="display:flex;gap:.5rem;margin-top:.35rem;align-items:center;flex-wrap:wrap;">
+            <span style="font-size:.72rem;background:rgba(26,111,196,.1);color:#1a6fc4;padding:.15rem .5rem;border-radius:5px;font-weight:600;">${c.type}</span>
+            <span style="font-size:.72rem;color:#718096;">${c.rating}/5</span>
+          </div>
+          <div style="margin-top:.35rem;"><a href="tel:${c.phone}" style="font-size:.75rem;color:#1a6fc4;text-decoration:none;font-weight:600;">${c.phone}</a></div>
+        </div>
+      </div>`;
+    card.addEventListener('mouseenter',()=>{card.style.borderColor='#4a9fd4';card.style.transform='translateX(2px)';});
+    card.addEventListener('mouseleave',()=>{card.style.borderColor='#e2e8f0';card.style.transform='';});
+    card.addEventListener('click',()=>{map.setView([c.lat,c.lon],14);marker.openPopup();});
+    document.getElementById('clinicList').appendChild(card);
+  });
+}
+
+function filterMap() {
+  const city = document.getElementById('cityFilter').value;
+  const type = document.getElementById('typeFilter').value;
+  const filtered = clinics.filter(c=>(city?c.city===city:true)&&(type?c.type===type:true));
+  renderClinics(filtered);
+}
+
+renderClinics(clinics);
+</script>
+{% endblock %}

@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+{% block title %}Nutrition Planner — OsteoAI{% endblock %}
+
+{% block extra_head %}
+<style>
+.nut-tab-row {
+  display: flex;
+  gap: 6px;
+  background: #f0f4f8;
+  border-radius: 12px;
+  padding: 5px;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.nut-tab-btn {
+  flex: 1;
+  min-width: 130px;
+  padding: .65rem 1.1rem;
+  border-radius: 9px;
+  background: transparent;
+  border: none;
+  font-size: .85rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all .2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+}
+.nut-tab-btn:hover {
+  color: #1a6fc4;
+  background: rgba(26,111,196,.06);
+}
+.nut-tab-btn.active {
+  background: white;
+  color: #1a6fc4;
+  box-shadow: 0 2px 8px rgba(0,0,0,.1);
+  font-weight: 700;
+}
+.nut-tab-btn.active i {
+  color: #1a6fc4;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-header-icon" style="background:linear-gradient(135deg,#38a169,#276749);"><i class="fas fa-apple-whole"></i></div>
+    <div class="page-header-text">
+        <h1>Smart Nutrition Planner</h1>
+        <p>Optimize your bone health through evidence-based dietary guidance</p>
+    </div>
+</div>
+
+<div class="nut-tab-row" id="nutTabRow">
+    <button class="nut-tab-btn active" id="nutBtnFood" onclick="nutTab('tabFood',this)">
+        <i class="fas fa-leaf" style="color:#38a169;"></i> Food Guide
+    </button>
+    <button class="nut-tab-btn" id="nutBtnMeal" onclick="nutTab('tabMeal',this)">
+        <i class="fas fa-utensils" style="color:#d97706;"></i> Meal Planner
+    </button>
+    <button class="nut-tab-btn" id="nutBtnTools" onclick="nutTab('tabTools',this)">
+        <i class="fas fa-calculator" style="color:#1a6fc4;"></i> Health Tools
+    </button>
+</div>
+
+<!-- Food Guide -->
+<div id="tabFood" class="nut-panel" style="display:block;">
+    <div class="two-col mb-4">
+        <div class="card">
+            <div class="card-header" style="background:linear-gradient(135deg,#e6f9f0,#f0fdf4);">
+                <i class="fas fa-droplet" style="color:#15803d;"></i>
+                <h3 style="color:#15803d;">Calcium-Rich Foods</h3>
+            </div>
+            <div class="card-body">
+                <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem;"><strong>Target: 1000–1200 mg per day</strong></p>
+                {% set calcium_foods = [
+                    ('🥛', 'Milk (1 cup)', '300 mg'),
+                    ('🧀', 'Yogurt (1 cup)', '450 mg'),
+                    ('🧀', 'Cheese (1 slice)', '200 mg'),
+                    ('🥬', 'Kale / Collard Greens', '240 mg'),
+                    ('🐟', 'Canned Sardines', '320 mg'),
+                    ('🫘', 'Fortified Tofu (½ cup)', '430 mg'),
+                    ('🟠', 'Fortified OJ (1 cup)', '300 mg'),
+                    ('🌰', 'Almonds (1 oz)', '75 mg'),
+                ] %}
+                {% for icon, name, amount in calcium_foods %}
+                <div class="food-card">
+                    <span class="food-icon">{{ icon }}</span>
+                    <div style="flex:1;">
+                        <div class="food-name">{{ name }}</div>
+                        <div class="food-calcium">{{ amount }} calcium</div>
+                        <div class="progress-bar-outer mt-1">
+                            <div class="progress-bar-inner" style="width:{{ (amount.split(' ')[0]|int / 450 * 100)|round|int }}%;background:#15803d;"></div>
+                        </div>
+                    </div>
+                    <span style="font-size:0.78rem;font-weight:700;color:#15803d;">{{ amount }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header" style="background:linear-gradient(135deg,#fffbeb,#fef9c3);">
+                <i class="fas fa-sun" style="color:#b45309;"></i>
+                <h3 style="color:#b45309;">Vitamin D Sources</h3>
+            </div>
+            <div class="card-body">
+                <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem;"><strong>Target: 600–800 IU per day</strong></p>
+                {% set vd_foods = [
+                    ('☀️', 'Sunlight (15–20 min)', 'Best source'),
+                    ('🐟', 'Salmon (3 oz)', '570 IU'),
+                    ('🐟', 'Tuna (3 oz)', '154 IU'),
+                    ('🥚', 'Egg Yolk', '41 IU'),
+                    ('🍄', 'UV Mushrooms (½ cup)', '366 IU'),
+                    ('🥛', 'Fortified Milk (1 cup)', '120 IU'),
+                    ('🟠', 'Fortified OJ', '100 IU'),
+                    ('🌾', 'Fortified Cereal', '80 IU'),
+                ] %}
+                {% for icon, name, amount in vd_foods %}
+                <div class="food-card">
+                    <span class="food-icon">{{ icon }}</span>
+                    <div style="flex:1;">
+                        <div class="food-name">{{ name }}</div>
+                        <div class="food-calcium">{{ amount }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header" style="background:linear-gradient(135deg,#fef2f2,#fee2e2);">
+            <i class="fas fa-ban" style="color:#b91c1c;"></i>
+            <h3 style="color:#b91c1c;">Foods to Limit or Avoid</h3>
+        </div>
+        <div class="card-body">
+            <div class="three-col">
+                {% for item in [
+                    ('🧂', 'Excessive Salt (Sodium)', 'Increases calcium excretion through urine'),
+                    ('☕', 'Caffeine (>3 cups/day)', 'Slightly interferes with calcium absorption'),
+                    ('🍺', 'Alcohol', 'Interferes with Vitamin D and bone formation'),
+                    ('🥤', 'Soft Drinks (Phosphoric acid)', 'Disrupts calcium-phosphate balance'),
+                    ('🚬', 'Smoking', 'Reduces blood supply and bone-forming cells'),
+                    ('🍟', 'High-Sodium Processed Foods', 'Leads to increased calcium loss'),
+                ] %}
+                <div style="padding:0.85rem;background:#fef2f2;border-radius:10px;border:1px solid #fecaca;">
+                    <div style="font-size:1.5rem;margin-bottom:0.3rem;">{{ item[0] }}</div>
+                    <div style="font-weight:700;font-size:0.85rem;color:#b91c1c;margin-bottom:0.2rem;">{{ item[1] }}</div>
+                    <div style="font-size:0.78rem;color:var(--text-muted);">{{ item[2] }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Meal Planner -->
+<div id="tabMeal" class="nut-panel" style="display:none;">
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+        <span style="font-weight:700;font-size:.9rem;color:var(--text-primary);">Diet Type:</span>
+        <button type="button" id="vegBtn" onclick="showPlan('veg')"
+          style="display:inline-flex;align-items:center;gap:.45rem;padding:.6rem 1.25rem;border-radius:10px;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;border:2px solid #15803d;background:#15803d;color:white;">
+          🌱 Vegetarian
+        </button>
+        <button type="button" id="nonvegBtn" onclick="showPlan('nonveg')"
+          style="display:inline-flex;align-items:center;gap:.45rem;padding:.6rem 1.25rem;border-radius:10px;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;border:2px solid #d97706;background:white;color:#d97706;">
+          🍗 Non-Vegetarian
+        </button>
+    </div>
+
+    <div id="planVeg" class="card">
+        <div class="card-header"><i class="fas fa-leaf" style="color:#15803d;"></i><h3>7-Day Vegetarian Bone Health Plan</h3></div>
+        <div class="card-body" style="padding:0;">
+            <div style="overflow-x:auto;">
+            <table class="data-table" style="min-width:700px;">
+                <thead><tr><th>Day</th><th>🌅 Breakfast</th><th>☀️ Lunch</th><th>🌙 Dinner</th></tr></thead>
+                <tbody>
+                {% for row in [
+                    ('Monday','Oatmeal with Almonds','Palak Paneer + Roti','Soup + Salad'),
+                    ('Tuesday','Greek Yogurt Parfait','Dal Tadka + Rice','Grilled Tofu + Veg'),
+                    ('Wednesday','Paneer Sandwich','Mixed Veg Curry','Lentil Soup'),
+                    ('Thursday','Ragi Malt + Fruit','Chole + Brown Rice','Sautéed Broccoli + Quinoa'),
+                    ('Friday','Idli with Sambar','Rajma Chawal','Methi Roti + Curd'),
+                    ('Saturday','Besan Chilla','Vegetable Khichdi','Vegetable Stew'),
+                    ('Sunday','Poha with Peas','Mushroom Masala','Baked Sweet Potato'),
+                ] %}
+                <tr>
+                    <td><strong>{{ row[0] }}</strong></td>
+                    <td>{{ row[1] }}</td><td>{{ row[2] }}</td><td>{{ row[3] }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="planNonveg" class="card" style="display:none;">
+        <div class="card-header"><i class="fas fa-drumstick-bite" style="color:#b45309;"></i><h3>7-Day Non-Vegetarian Bone Health Plan</h3></div>
+        <div class="card-body" style="padding:0;">
+            <div style="overflow-x:auto;">
+            <table class="data-table" style="min-width:700px;">
+                <thead><tr><th>Day</th><th>🌅 Breakfast</th><th>☀️ Lunch</th><th>🌙 Dinner</th></tr></thead>
+                <tbody>
+                {% for row in [
+                    ('Monday','Scrambled Eggs + Toast','Grilled Chicken Salad','Bone Broth Soup'),
+                    ('Tuesday','Omelette with Spinach','Fish Curry + Rice','Baked Fish'),
+                    ('Wednesday','Boiled Eggs + Fruit','Chicken Stir Fry','Chicken Stew'),
+                    ('Thursday','Chicken Sausage','Tuna Sandwich','Grilled Salmon'),
+                    ('Friday','Greek Yogurt + Berries','Salmon + Asparagus','Egg Curry'),
+                    ('Saturday','Mackerel on Toast','Chicken Curry','Roast Chicken'),
+                    ('Sunday','Egg Bhurji','Prawn Masala','Fish Tacos'),
+                ] %}
+                <tr>
+                    <td><strong>{{ row[0] }}</strong></td>
+                    <td>{{ row[1] }}</td><td>{{ row[2] }}</td><td>{{ row[3] }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Health Tools -->
+<div id="tabTools" class="nut-panel" style="display:none;">
+    <div class="three-col">
+        <!-- BMI Calculator -->
+        <div class="card">
+            <div class="card-header"><i class="fas fa-weight-scale" style="color:var(--primary);"></i><h3>BMI Calculator</h3></div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label">Weight (kg)</label>
+                    <input type="number" id="bmiWeight" class="form-control" value="65" min="10" max="300">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Height (cm)</label>
+                    <input type="number" id="bmiHeight" class="form-control" value="170" min="50" max="250">
+                </div>
+                <button class="btn btn-primary btn-full" onclick="calcBMI()">Calculate BMI</button>
+                <div id="bmiResult" style="display:none;margin-top:1rem;text-align:center;padding:1rem;border-radius:10px;"></div>
+            </div>
+        </div>
+
+        <!-- Calcium Counter -->
+        <div class="card">
+            <div class="card-header"><i class="fas fa-glass-water" style="color:#15803d;"></i><h3>Calcium Counter</h3></div>
+            <div class="card-body">
+                <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:1rem;">Daily Goal: <strong>1000 mg</strong></p>
+                <div id="calciumTotal" style="text-align:center;font-size:2rem;font-weight:900;color:var(--primary);margin-bottom:0.5rem;">0 mg</div>
+                <div class="progress-bar-outer mb-3">
+                    <div class="progress-bar-inner" id="calciumBar" style="width:0%;background:var(--primary);"></div>
+                </div>
+                {% for food, mg in [('Milk (1 cup)',300),('Yogurt (1 cup)',450),('Cheese (1 slice)',200),('Spinach (1 cup)',240),('Almonds (1 oz)',75),('Tofu (½ cup)',430)] %}
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;font-size:0.82rem;">
+                    <label><input type="checkbox" onchange="updateCalcium({{ mg }},this.checked)" style="margin-right:0.4rem;"> {{ food }}</label>
+                    <span style="color:var(--primary);font-weight:600;">{{ mg }} mg</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- T-Score Guide -->
+        <div class="card">
+            <div class="card-header"><i class="fas fa-chart-bar" style="color:var(--primary);"></i><h3>T-Score Reference</h3></div>
+            <div class="card-body">
+                <div style="margin-bottom:1rem;">
+                    <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.5rem;">Enter your T-Score:</div>
+                    <input type="number" id="tscore" class="form-control" step="0.1" min="-5" max="5" value="-1" oninput="checkTScore()">
+                </div>
+                <div id="tscoreResult" style="text-align:center;padding:1rem;border-radius:10px;background:#f0fdf4;border:1px solid #86efac;">
+                    <div style="font-size:1.5rem;font-weight:900;color:#15803d;">Osteopenia</div>
+                    <div style="font-size:0.82rem;color:var(--text-muted);margin-top:0.25rem;">Mild bone loss — take preventive action</div>
+                </div>
+                <div style="margin-top:1rem;font-size:0.78rem;color:var(--text-muted);">
+                    <div style="padding:0.35rem 0.5rem;background:#f0fdf4;border-radius:6px;margin-bottom:3px;"><strong>≥ -1.0</strong> → Normal bone density</div>
+                    <div style="padding:0.35rem 0.5rem;background:#fffbeb;border-radius:6px;margin-bottom:3px;"><strong>-1.0 to -2.5</strong> → Osteopenia</div>
+                    <div style="padding:0.35rem 0.5rem;background:#fef2f2;border-radius:6px;"><strong>≤ -2.5</strong> → Osteoporosis</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function nutTab(tabId, btn) {
+  document.querySelectorAll('.nut-panel').forEach(function(p){ p.style.display='none'; });
+  document.querySelectorAll('#nutTabRow .nut-tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById(tabId).style.display = 'block';
+  btn.classList.add('active');
+}
+
+function showPlan(type) {
+  var vegBtn = document.getElementById('vegBtn');
+  var nonvegBtn = document.getElementById('nonvegBtn');
+  var planVeg = document.getElementById('planVeg');
+  var planNonveg = document.getElementById('planNonveg');
+
+  if (type === 'veg') {
+    planVeg.style.display = 'block';
+    planNonveg.style.display = 'none';
+    vegBtn.style.background = '#15803d';
+    vegBtn.style.color = 'white';
+    vegBtn.style.borderColor = '#15803d';
+    nonvegBtn.style.background = 'white';
+    nonvegBtn.style.color = '#d97706';
+    nonvegBtn.style.borderColor = '#d97706';
+  } else {
+    planVeg.style.display = 'none';
+    planNonveg.style.display = 'block';
+    nonvegBtn.style.background = '#d97706';
+    nonvegBtn.style.color = 'white';
+    nonvegBtn.style.borderColor = '#d97706';
+    vegBtn.style.background = 'white';
+    vegBtn.style.color = '#15803d';
+    vegBtn.style.borderColor = '#15803d';
+  }
+}
+
+// Health tools functions
+function calcBMI() {
+  var w = parseFloat(document.getElementById('bmiWeight').value) || 65;
+  var h = parseFloat(document.getElementById('bmiHeight').value) || 170;
+  var bmi = w / ((h / 100) ** 2);
+  var cat = bmi < 18.5 ? 'Underweight' : bmi < 25 ? 'Normal' : bmi < 30 ? 'Overweight' : 'Obese';
+  var colors = { 'Underweight': ['#dbeafe','#1d4ed8'], 'Normal': ['#dcfce7','#15803d'], 'Overweight': ['#fef9c3','#92400e'], 'Obese': ['#fee2e2','#b91c1c'] };
+  var c = colors[cat];
+  var r = document.getElementById('bmiResult');
+  r.style.display = 'block';
+  r.style.background = c[0];
+  r.style.border = '1.5px solid ' + c[1];
+  r.innerHTML = '<div style="font-size:2rem;font-weight:900;color:' + c[1] + ';">' + bmi.toFixed(1) + '</div>' +
+    '<div style="font-weight:700;color:' + c[1] + ';">' + cat + '</div>' +
+    '<div style="font-size:.78rem;color:#64748b;margin-top:.3rem;">Weight: ' + w + 'kg | Height: ' + h + 'cm</div>';
+}
+
+var calciumTotal = 0;
+function updateCalcium(mg, checked) {
+  calciumTotal += checked ? mg : -mg;
+  if (calciumTotal < 0) calciumTotal = 0;
+  document.getElementById('calciumTotal').textContent = calciumTotal + ' mg';
+  var pct = Math.min(calciumTotal / 1000 * 100, 100);
+  var bar = document.getElementById('calciumBar');
+  bar.style.width = pct + '%';
+  bar.style.background = pct >= 100 ? '#15803d' : pct >= 60 ? '#f6b93b' : '#e53e3e';
+}
+
+function checkTScore() {
+  var ts = parseFloat(document.getElementById('tscore').value);
+  var r = document.getElementById('tscoreResult');
+  if (ts >= -1.0) {
+    r.style.background='#f0fdf4'; r.style.borderColor='#86efac';
+    r.innerHTML='<div style="font-size:1.4rem;font-weight:900;color:#15803d;">Normal</div><div style="font-size:.8rem;color:#64748b;margin-top:.2rem;">Bone density is within the normal range</div>';
+  } else if (ts >= -2.5) {
+    r.style.background='#fffbeb'; r.style.borderColor='#fbbf24';
+    r.innerHTML='<div style="font-size:1.4rem;font-weight:900;color:#92400e;">Osteopenia</div><div style="font-size:.8rem;color:#64748b;margin-top:.2rem;">Mild bone loss — take preventive action</div>';
+  } else {
+    r.style.background='#fef2f2'; r.style.borderColor='#fca5a5';
+    r.innerHTML='<div style="font-size:1.4rem;font-weight:900;color:#b91c1c;">Osteoporosis</div><div style="font-size:.8rem;color:#64748b;margin-top:.2rem;">Significant bone loss — consult a doctor immediately</div>';
+  }
+}
+</script>
+{% endblock %}

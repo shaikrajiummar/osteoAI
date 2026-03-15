@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block title %}Cloud Analytics — OsteoAI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-icon" style="background:linear-gradient(135deg,#0ea5e9,#0369a1);"><i class="fas fa-chart-column"></i></div>
+  <div class="page-header-text">
+    <h1>Cloud Health Analytics</h1>
+    <p>Real-time population insights and model performance from MongoDB Atlas</p>
+  </div>
+  <div style="margin-left:auto;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:.4rem .85rem;font-size:.82rem;color:#15803d;display:flex;align-items:center;gap:.4rem;">
+    <span class="status-dot status-online"></span> Live Data
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="metrics-grid mb-4">
+  <div class="metric-card">
+    <div class="metric-icon blue"><i class="fas fa-database"></i></div>
+    <div class="metric-body"><div class="metric-label">Global Records</div><div class="metric-value">{{ stats.get('total_screenings',0) }}</div><div class="metric-sub metric-up">+15 this week</div></div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-icon red"><i class="fas fa-bone"></i></div>
+    <div class="metric-body"><div class="metric-label">High Risk Cases</div><div class="metric-value">{{ stats.get('osteoporosis_cases',0) }}</div></div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-icon green"><i class="fas fa-user-doctor"></i></div>
+    <div class="metric-body"><div class="metric-label">Active Physicians</div><div class="metric-value">{{ stats.get('active_users',0) }}</div><div class="metric-sub metric-up">+2 this month</div></div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-icon amber"><i class="fas fa-brain"></i></div>
+    <div class="metric-body"><div class="metric-label">Avg. AI Accuracy</div><div class="metric-value">94.8%</div></div>
+  </div>
+</div>
+
+<!-- Live charts -->
+<div class="two-col mb-4">
+  <div class="card">
+    <div class="card-header"><i class="fas fa-chart-pie" style="color:var(--primary);"></i><h3>Population Risk Distribution</h3></div>
+    <div class="card-body"><div id="riskPie" style="height:280px;"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><i class="fas fa-chart-area" style="color:var(--primary);"></i><h3>Monthly Screening Volume</h3></div>
+    <div class="card-body"><div id="trendArea" style="height:280px;"></div></div>
+  </div>
+</div>
+
+<!-- Model performance images from actual project -->
+<div class="card mb-4">
+  <div class="card-header"><i class="fas fa-trophy" style="color:var(--warning);"></i><h3>Model Performance Analytics</h3></div>
+  <div class="card-body">
+    <div class="two-col">
+      <div>
+        <p style="font-size:.82rem;font-weight:700;color:var(--text-secondary);margin-bottom:.5rem;">Class Distribution</p>
+        <img src="{{ url_for('static', filename='assets/class_distribution.png') }}" style="width:100%;border-radius:10px;box-shadow:var(--shadow-sm);" alt="Class Distribution">
+      </div>
+      <div>
+        <p style="font-size:.82rem;font-weight:700;color:var(--text-secondary);margin-bottom:.5rem;">Model Comparison</p>
+        <img src="{{ url_for('static', filename='assets/model_comparison.png') }}" style="width:100%;border-radius:10px;box-shadow:var(--shadow-sm);" alt="Model Comparison">
+      </div>
+    </div>
+    <div class="two-col" style="margin-top:1rem;">
+      <div>
+        <p style="font-size:.82rem;font-weight:700;color:var(--text-secondary);margin-bottom:.5rem;">ROC Curves</p>
+        <img src="{{ url_for('static', filename='assets/roc_curves.png') }}" style="width:100%;border-radius:10px;box-shadow:var(--shadow-sm);" alt="ROC Curves">
+      </div>
+      <div>
+        <p style="font-size:.82rem;font-weight:700;color:var(--text-secondary);margin-bottom:.5rem;">Confusion Matrix</p>
+        <img src="{{ url_for('static', filename='assets/confusion_matrix.png') }}" style="width:100%;border-radius:10px;box-shadow:var(--shadow-sm);" alt="Confusion Matrix">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Data Explorer -->
+<div class="card">
+  <div class="card-header">
+    <i class="fas fa-table" style="color:var(--primary);"></i><h3>Data Explorer</h3>
+    <div style="margin-left:auto;display:flex;gap:.5rem;flex-wrap:wrap;">
+      <select id="riskFilter" class="form-select" style="font-size:.78rem;padding:.3rem .65rem;width:auto;" onchange="filterTable()">
+        <option value="">All Risk Levels</option>
+        <option>Normal</option><option>Osteopenia</option><option>Osteoporosis</option>
+      </select>
+      <button class="btn btn-primary" style="padding:.3rem .85rem;font-size:.78rem;" onclick="exportCSV()">
+        <i class="fas fa-download"></i> CSV
+      </button>
+    </div>
+  </div>
+  <div style="overflow-x:auto;">
+    <table class="data-table">
+      <thead><tr><th>#</th><th>Date &amp; Time</th><th>Patient Name</th><th>Age</th><th>Gender</th><th>BMI</th><th>T-Score</th><th>Risk Level</th><th>Confidence</th><th>Mode</th></tr></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    <div id="noDataMsg" style="text-align:center;padding:2.5rem;color:var(--text-muted);">
+      <i class="fas fa-database" style="font-size:2.5rem;color:var(--border);display:block;margin-bottom:.75rem;"></i>
+      <p>No records yet. Complete assessments to see data here.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const allRecords = {{ records|safe }};
+
+function badgeClass(r){return r==='Normal'?'badge-normal':r==='Osteopenia'?'badge-osteopenia':'badge-osteoporosis';}
+
+function renderTable(data){
+  const tb=document.getElementById('tableBody'); tb.innerHTML='';
+  document.getElementById('noDataMsg').style.display=data.length?'none':'';
+  data.forEach((r,i)=>{
+    tb.innerHTML+=`<tr>
+      <td>${i+1}</td>
+      <td style="white-space:nowrap;font-size:.82rem;">${r.date||'—'}</td>
+      <td><strong>${r.name||'—'}</strong></td>
+      <td>${r.age||'—'}</td>
+      <td>${r.gender||'—'}</td>
+      <td>${r.bmi||'—'}</td>
+      <td>${r.t_score||'—'}</td>
+      <td><span class="badge ${badgeClass(r.risk)}">${r.risk}</span></td>
+      <td><strong>${r.confidence}%</strong></td>
+      <td style="font-size:.75rem;color:#64748b;">${(r.mode||'—').slice(0,22)}</td>
+    </tr>`;
+  });
+}
+
+function filterTable(){
+  const risk=document.getElementById('riskFilter').value;
+  renderTable(risk?allRecords.filter(r=>r.risk===risk):allRecords);
+}
+
+function exportCSV(){
+  const rows=[['Date','Patient Name','Age','Gender','BMI','T-Score','Risk Level','Confidence','Mode']];
+  allRecords.forEach(r=>rows.push([r.date,r.name,r.age,r.gender,r.bmi||'',r.t_score||'',r.risk,r.confidence+'%',r.mode||'']));
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(rows.map(r=>r.join(',')).join('\n'));
+  a.download='osteoai_data.csv'; a.click();
+}
+
+renderTable(allRecords);
+
+// Risk donut
+const rc={Normal:0,Osteopenia:0,Osteoporosis:0};
+allRecords.forEach(r=>{if(rc[r.risk]!==undefined)rc[r.risk]++;});
+if(!allRecords.length){rc.Normal=45;rc.Osteopenia=30;rc.Osteoporosis=15;}
+Plotly.newPlot('riskPie',[{labels:Object.keys(rc),values:Object.values(rc),type:'pie',hole:.5,
+  marker:{colors:['#06c270','#f6b93b','#e53e3e']},textinfo:'label+percent',
+  hovertemplate:'<b>%{label}</b><br>%{value} patients<extra></extra>'}],
+  {margin:{t:10,b:10,l:10,r:10},paper_bgcolor:'transparent',legend:{orientation:'h',y:-0.05},height:260},{displayModeBar:false,responsive:true});
+
+// Trend
+Plotly.newPlot('trendArea',[{
+  x:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+  y:[22,28,35,31,42,38,45,40,48,55,50,58],
+  type:'scatter',mode:'lines',fill:'tozeroy',line:{color:'#1a6fc4',width:2.5},fillcolor:'rgba(26,111,196,0.1)'}],
+  {margin:{t:10,b:30,l:40,r:10},paper_bgcolor:'transparent',plot_bgcolor:'transparent',
+  xaxis:{showgrid:false},yaxis:{gridcolor:'#f0f4f8'},height:260},{displayModeBar:false,responsive:true});
+</script>
+{% endblock %}

@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}AI Assistant — OsteoAI{% endblock %}
+{% block extra_head %}
+<style>
+.chat-input-row{display:flex;gap:.5rem;padding:1rem;border-top:1px solid var(--border);background:white;}
+.chat-input-row input{flex:1;padding:.7rem 1rem;border:1.5px solid var(--border);border-radius:25px;font-family:'Inter',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s;}
+.chat-input-row input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(26,111,196,.1);}
+.chip-btn{padding:.4rem .9rem;border:1.5px solid var(--border);border-radius:25px;background:white;font-size:.78rem;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;}
+.chip-btn:hover{border-color:var(--primary-light);color:var(--primary);background:rgba(26,111,196,.04);}
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-header-icon" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);"><i class="fas fa-robot"></i></div>
+  <div class="page-header-text">
+    <h1>Dr. Bone AI Assistant</h1>
+    <p>Ask anything about osteoporosis, bone health, treatment and prevention</p>
+  </div>
+</div>
+
+<div class="col-2-1" style="align-items:start;">
+  <!-- Chat -->
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-comments" style="color:#7c3aed;"></i>
+      <h3>Chat with AI</h3>
+      <div style="margin-left:auto;display:flex;gap:.4rem;">
+        <button class="btn btn-secondary" style="padding:.3rem .75rem;font-size:.75rem;" onclick="clearChat()">
+          <i class="fas fa-trash"></i> Clear
+        </button>
+        <button class="btn btn-secondary" style="padding:.3rem .75rem;font-size:.75rem;" onclick="exportChat()">
+          <i class="fas fa-download"></i> Export
+        </button>
+      </div>
+    </div>
+    <div class="chat-container" id="chatContainer">
+      <div class="chat-msg" style="max-width:85%;">
+        <div class="chat-avatar bot"><i class="fas fa-robot"></i></div>
+        <div class="chat-bubble bot">
+          👋 Hello! I'm Dr. Bone AI. I can help you with osteoporosis symptoms, T-score interpretation, calcium intake, exercise recommendations, and more.<br><br>
+          <strong>Try asking me about:</strong> T-score values, calcium-rich foods, best exercises, fracture risk, or treatment options.
+        </div>
+      </div>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" id="chatInput" placeholder="Ask about bone health, T-scores, calcium intake…" onkeypress="if(event.key==='Enter')sendChat()">
+      <button class="btn btn-primary" onclick="sendChat()" style="border-radius:25px;padding:.65rem 1.25rem;">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div>
+    <div class="card mb-3">
+      <div class="card-header"><i class="fas fa-lightbulb" style="color:var(--warning);"></i><h3>Quick Questions</h3></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:.45rem;">
+        {% for q in ['What is a T-score?','What are symptoms of osteoporosis?','Best calcium-rich foods?','How to interpret bone density results?','Which exercises help bones?','What causes osteoporosis?','How is osteoporosis treated?','What is Vitamin D role?'] %}
+        <button class="chip-btn" style="text-align:left;" onclick="askQuestion('{{ q }}')">
+          <i class="fas fa-chevron-right" style="color:var(--primary);font-size:.65rem;"></i> {{ q }}
+        </button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><i class="fas fa-bone" style="color:var(--primary);"></i><h3>Did You Know?</h3></div>
+      <div class="card-body">
+        <div id="boneFact" style="font-size:.84rem;color:var(--text-secondary);line-height:1.7;padding:.85rem;background:#eff6ff;border-radius:10px;">
+          Loading fact…
+        </div>
+        <button class="btn btn-secondary btn-full" style="margin-top:.75rem;font-size:.8rem;" onclick="newFact()">
+          <i class="fas fa-shuffle"></i> New Fact
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const facts = [
+  "🦴 Your skeleton completely renews itself every 10 years through bone remodeling.",
+  "🥛 The human body contains about 2–3 pounds of calcium — 99% in bones and teeth.",
+  "👵 Women can lose up to 20% of bone density in the 5–7 years after menopause.",
+  "🌞 Vitamin D from just 15 minutes of sunlight significantly improves calcium absorption.",
+  "🏃 Weight-bearing exercise like walking can increase bone density by up to 2% per year.",
+  "📉 A T-score below –2.5 is the WHO diagnostic threshold for osteoporosis.",
+  "🌍 Osteoporosis affects over 200 million people worldwide — 1 in 3 women over 50.",
+  "💊 Bisphosphonates reduce fracture risk by up to 50% in diagnosed patients.",
+  "🍃 Dark leafy greens like kale and broccoli are excellent non-dairy calcium sources.",
+  "🧬 Genetics account for 50–80% of peak bone density variability between individuals.",
+];
+let factIdx = Math.floor(Math.random() * facts.length);
+document.getElementById('boneFact').textContent = facts[factIdx];
+function newFact() { factIdx = (factIdx+1)%facts.length; document.getElementById('boneFact').textContent = facts[factIdx]; }
+
+let chatHistory = [];
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  appendMsg(msg, 'user');
+  const typing = appendTyping();
+  try {
+    const resp = await fetch("{{ url_for('chat_api') }}", {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({message: msg})
+    });
+    const data = await resp.json();
+    removeTyping(typing);
+    appendMsg(data.response || data.error || 'Sorry, I could not process that.', 'bot');
+  } catch(e) {
+    removeTyping(typing);
+    appendMsg('Connection error. Please try again.', 'bot');
+  }
+}
+
+function appendMsg(text, who) {
+  const container = document.getElementById('chatContainer');
+  const div = document.createElement('div');
+  div.className = `chat-msg${who==='user'?' user':''}`;
+  div.style.maxWidth = '80%';
+  div.innerHTML = `
+    <div class="chat-avatar ${who}"><i class="fas fa-${who==='bot'?'robot':'user-doctor'}"></i></div>
+    <div class="chat-bubble ${who}">${text}</div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return div;
+}
+
+function appendTyping() {
+  const container = document.getElementById('chatContainer');
+  const div = document.createElement('div');
+  div.className = 'chat-msg'; div.style.maxWidth = '80%';
+  div.innerHTML = `<div class="chat-avatar bot"><i class="fas fa-robot"></i></div>
+    <div class="chat-bubble bot"><div class="typing-indicator">
+      <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+    </div></div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return div;
+}
+
+function removeTyping(el) { if (el && el.parentElement) el.parentElement.removeChild(el); }
+
+function askQuestion(q) {
+  document.getElementById('chatInput').value = q;
+  sendChat();
+}
+
+function clearChat() {
+  const c = document.getElementById('chatContainer');
+  c.innerHTML = `<div class="chat-msg" style="max-width:85%;">
+    <div class="chat-avatar bot"><i class="fas fa-robot"></i></div>
+    <div class="chat-bubble bot">Chat cleared. How can I help you with bone health today?</div>
+  </div>`;
+}
+
+function exportChat() {
+  const msgs = document.querySelectorAll('.chat-bubble');
+  let txt = 'OsteoAI Chat Export\n' + '='.repeat(30) + '\n\n';
+  msgs.forEach(m => { txt += (m.classList.contains('user')?'You':'Dr. Bone AI') + ':\n' + m.textContent.trim() + '\n\n'; });
+  const a = document.createElement('a');
+  a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(txt);
+  a.download = 'osteoai_chat.txt'; a.click();
+}
+</script>
+{% endblock %}

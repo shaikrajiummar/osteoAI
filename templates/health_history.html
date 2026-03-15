@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% block title %}Health History — OsteoAI{% endblock %}
+
+{% block extra_head %}
+<style>
+.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem;}
+.modal-box{background:#fff;border-radius:18px;width:100%;max-width:780px;max-height:90vh;overflow-y:auto;box-shadow:0 25px 60px rgba(0,0,0,.25);}
+.modal-header{padding:1.25rem 1.5rem;border-bottom:1.5px solid #e2e8f0;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;background:#fff;z-index:2;border-radius:18px 18px 0 0;}
+.modal-body{padding:1.5rem;}
+.modal-close{margin-left:auto;background:none;border:none;font-size:1.3rem;cursor:pointer;color:#64748b;padding:.25rem .5rem;border-radius:8px;line-height:1;}
+.modal-close:hover{background:#f1f5f9;color:#1e293b;}
+.report-banner{border-radius:12px;padding:1.25rem;text-align:center;border:2px solid;margin-bottom:1.25rem;}
+.report-banner.normal{background:#f0fdf4;border-color:#86efac;color:#15803d;}
+.report-banner.osteopenia{background:#fffbeb;border-color:#fbbf24;color:#92400e;}
+.report-banner.osteoporosis{background:#fef2f2;border-color:#fca5a5;color:#b91c1c;}
+.info-chip{display:inline-flex;align-items:center;gap:.3rem;padding:.3rem .7rem;background:#f0f4f8;border-radius:8px;font-size:.8rem;margin:.2rem;}
+.rf-chip{display:inline-flex;align-items:center;gap:.3rem;padding:.28rem .65rem;border-radius:8px;font-size:.76rem;font-weight:600;margin:.18rem;}
+.rf-chip.danger{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;}
+.rf-chip.warning{background:#fffbeb;color:#92400e;border:1px solid #fde68a;}
+.xray-pair{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:.75rem;}
+.xray-card{border-radius:12px;overflow:hidden;position:relative;border:1.5px solid #e2e8f0;}
+.xray-card img{width:100%;display:block;max-height:220px;object-fit:cover;}
+.xray-lbl{position:absolute;bottom:0;left:0;right:0;padding:.35rem .7rem;font-size:.72rem;font-weight:700;color:#fff;display:flex;align-items:center;gap:.35rem;}
+.xray-lbl.original{background:rgba(0,0,0,.65);}
+.xray-lbl.gradcam{background:rgba(120,0,180,.7);}
+.view-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.42rem .9rem;border-radius:9px;background:var(--primary);color:#fff;font-size:.78rem;font-weight:700;border:none;cursor:pointer;transition:opacity .18s;}
+.view-btn:hover{opacity:.85;}
+.section-title{font-weight:700;font-size:.83rem;color:var(--text-primary);margin:.9rem 0 .5rem;display:flex;align-items:center;gap:.4rem;}
+.divider{border:none;border-top:1.5px solid #f0f4f8;margin:.9rem 0;}
+.recs{padding-left:0;margin:0;}
+.recs li{font-size:.82rem;color:var(--text-secondary);line-height:2.2;list-style:none;padding:.1rem 0;}
+.badge-normal{background:#e6f9f0;color:#15803d;padding:.2rem .65rem;border-radius:50px;font-size:.75rem;font-weight:700;}
+.badge-osteopenia{background:#fffbeb;color:#92400e;padding:.2rem .65rem;border-radius:50px;font-size:.75rem;font-weight:700;}
+.badge-osteoporosis{background:#fef2f2;color:#b91c1c;padding:.2rem .65rem;border-radius:50px;font-size:.75rem;font-weight:700;}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-icon" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);"><i class="fas fa-chart-line"></i></div>
+  <div class="page-header-text">
+    <h1>Health History &amp; Risk Trends</h1>
+    <p>Track bone health over time with AI-powered longitudinal analysis</p>
+  </div>
+  <a href="{{ url_for('assessment') }}" class="btn btn-primary" style="margin-left:auto;">
+    <i class="fas fa-plus"></i> New Assessment
+  </a>
+</div>
+
+<div class="metrics-grid mb-4">
+  <div class="metric-card">
+    <div class="metric-icon blue"><i class="fas fa-clipboard-list"></i></div>
+    <div class="metric-body"><div class="metric-label">Total Records</div><div class="metric-value" id="totalRec">0</div></div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-icon green"><i class="fas fa-stethoscope"></i></div>
+    <div class="metric-body"><div class="metric-label">Latest Status</div><div class="metric-value" id="latestStatus" style="font-size:1.1rem;">—</div></div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-icon amber"><i class="fas fa-percent"></i></div>
+    <div class="metric-body"><div class="metric-label">Latest Confidence</div><div class="metric-value" id="latestConf">—</div></div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-icon purple"><i class="fas fa-calendar"></i></div>
+    <div class="metric-body"><div class="metric-label">Last Assessment</div><div class="metric-value" id="lastDate" style="font-size:.9rem;">—</div></div>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header">
+    <i class="fas fa-chart-line" style="color:var(--primary);"></i>
+    <h3>Risk Level Over Time</h3>
+  </div>
+  <div class="card-body">
+    <div id="historyChart" style="height:300px;"></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <i class="fas fa-table" style="color:var(--primary);"></i>
+    <h3>Assessment Log</h3>
+  </div>
+  <div style="overflow-x:auto;">
+    <table class="data-table">
+      <thead>
+        <tr><th>#</th><th>Date &amp; Time</th><th>Patient</th><th>Risk Level</th><th>Confidence</th><th>Mode</th><th>Report</th></tr>
+      </thead>
+      <tbody id="historyBody"></tbody>
+    </table>
+    <div id="historyEmpty" style="text-align:center;padding:3rem;color:var(--text-muted);">
+      <i class="fas fa-chart-line" style="font-size:3rem;color:var(--border);display:block;margin-bottom:.75rem;"></i>
+      <h3 style="font-size:1rem;margin-bottom:.5rem;">No history yet</h3>
+      <p style="font-size:.88rem;">Complete your first assessment to see results here.</p>
+      <a href="{{ url_for('assessment') }}" class="btn btn-primary" style="margin-top:1rem;">
+        <i class="fas fa-microscope"></i> Start Assessment
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Report Modal -->
+<div class="modal-backdrop" id="reportModal" style="display:none;" onclick="closeModal(event)">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-header">
+      <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1a6fc4,#1557a0);display:flex;align-items:center;justify-content:center;">
+        <i class="fas fa-file-medical" style="color:#fff;font-size:.9rem;"></i>
+      </div>
+      <div>
+        <div style="font-weight:800;font-size:1rem;color:var(--text-primary);" id="modalTitle">Patient Report</div>
+        <div style="font-size:.75rem;color:var(--text-muted);" id="modalSubtitle">AI Assessment</div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('reportModal').style.display='none'">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const history = {{ history|safe }};
+const riskColor = {'Normal':'#06c270','Osteopenia':'#f6b93b','Osteoporosis':'#e53e3e'};
+const riskNum   = {'Normal':1,'Osteopenia':2,'Osteoporosis':3};
+
+document.getElementById('historyEmpty').style.display = history.length ? 'none' : '';
+document.getElementById('totalRec').textContent = history.length;
+
+if (history.length) {
+  const first = history[0];
+  document.getElementById('latestStatus').textContent = first.prediction || '—';
+  document.getElementById('latestConf').textContent   = parseFloat(first.confidence||0).toFixed(1) + '%';
+  document.getElementById('lastDate').textContent     = (first.timestamp||'').slice(0,10) || '—';
+
+  const tbody = document.getElementById('historyBody');
+  history.forEach(function(r, i) {
+    const risk = r.prediction || '—';
+    const cls  = risk==='Normal'?'badge-normal': risk==='Osteopenia'?'badge-osteopenia':'badge-osteoporosis';
+    const mode = (r.analysis_mode||'—').replace('ML: ','').slice(0,22);
+    tbody.innerHTML += `<tr>
+      <td>${i+1}</td>
+      <td style="white-space:nowrap;font-size:.82rem;">${(r.timestamp||'').slice(0,16)||'—'}</td>
+      <td><strong>${r.patient_name||(r.patient_data||{}).name||'—'}</strong></td>
+      <td><span class="${cls}">${risk}</span></td>
+      <td><strong>${parseFloat(r.confidence||0).toFixed(1)}%</strong></td>
+      <td style="font-size:.75rem;color:var(--text-muted);">${mode}</td>
+      <td><button class="view-btn" onclick="viewReport(${i})"><i class="fas fa-eye"></i> View Report</button></td>
+    </tr>`;
+  });
+
+  const rev   = [...history].reverse();
+  const dates = rev.map(r=>(r.timestamp||'').slice(0,16));
+  const vals  = rev.map(r=>riskNum[r.prediction]||1);
+  Plotly.newPlot('historyChart',[{
+    x:dates,y:vals,type:'scatter',mode:'lines+markers',
+    line:{color:'#1a6fc4',width:3},
+    marker:{color:vals.map(v=>v===3?'#e53e3e':v===2?'#f6b93b':'#06c270'),size:11,line:{color:'white',width:2}},
+    hovertemplate:'<b>%{x}</b><br>Risk: %{text}<extra></extra>',
+    text:rev.map(r=>r.prediction)
+  }],{
+    margin:{t:20,b:60,l:100,r:20},paper_bgcolor:'transparent',plot_bgcolor:'transparent',
+    yaxis:{tickvals:[1,2,3],ticktext:['Normal','Osteopenia','Osteoporosis'],gridcolor:'#f0f4f8',range:[.5,3.5]},
+    xaxis:{gridcolor:'#f0f4f8'},
+    shapes:[
+      {type:'rect',xref:'paper',yref:'y',x0:0,x1:1,y0:.5,y1:1.5,fillcolor:'rgba(6,194,112,.06)',line:{width:0}},
+      {type:'rect',xref:'paper',yref:'y',x0:0,x1:1,y0:1.5,y1:2.5,fillcolor:'rgba(246,185,59,.06)',line:{width:0}},
+      {type:'rect',xref:'paper',yref:'y',x0:0,x1:1,y0:2.5,y1:3.5,fillcolor:'rgba(229,62,62,.06)',line:{width:0}}
+    ]
+  },{displayModeBar:false,responsive:true});
+} else {
+  Plotly.newPlot('historyChart',[{
+    x:['Jan','Feb','Mar','Apr'],y:[1,1,2,1],type:'scatter',mode:'lines+markers',
+    line:{color:'#cbd5e0',width:2,dash:'dot'},marker:{color:'#cbd5e0',size:8}
+  }],{
+    margin:{t:20,b:40,l:100,r:20},paper_bgcolor:'transparent',plot_bgcolor:'transparent',
+    yaxis:{tickvals:[1,2,3],ticktext:['Normal','Osteopenia','Osteoporosis'],gridcolor:'#f0f4f8'},
+    annotations:[{xref:'paper',yref:'paper',x:.5,y:.5,text:'No data yet — run an assessment first',showarrow:false,font:{color:'#94a3b8',size:13}}]
+  },{displayModeBar:false,responsive:true});
+}
+
+function viewReport(idx) {
+  const r = history[idx];
+  if (!r) return;
+  const risk  = r.prediction || 'Unknown';
+  const cls   = risk==='Normal'?'normal': risk==='Osteopenia'?'osteopenia':'osteoporosis';
+
+  // Risk factor chips
+  let rfHtml = '';
+  if (r.risk_factors && r.risk_factors.length) {
+    r.risk_factors.forEach(function(rf) {
+      const label    = Array.isArray(rf) ? rf[0] : (rf.label||String(rf));
+      const severity = Array.isArray(rf) ? rf[2] : (rf.severity||'warning');
+      rfHtml += `<span class="rf-chip ${severity}">${label}</span>`;
+    });
+  } else {
+    rfHtml = '<span style="font-size:.82rem;color:var(--text-muted);">None identified</span>';
+  }
+
+  // Recommendations
+  let recs = '';
+  if (risk==='Osteoporosis')
+    recs='<li>🏥 Consult an endocrinologist immediately</li><li>💊 Consider bisphosphonate therapy (e.g. Alendronate)</li><li>🥛 Calcium 1200mg + Vitamin D3 800IU daily</li><li>🧘 Tai Chi &amp; balance exercises to prevent falls</li><li>🔬 Follow-up DEXA scan in 6 months</li>';
+  else if (risk==='Osteopenia')
+    recs='<li>📅 Follow-up DEXA scan in 1 year</li><li>🥛 Increase calcium (1000mg) and Vitamin D</li><li>🏋️ Start weight-bearing exercise program</li><li>🚭 Reduce alcohol and smoking</li><li>🩺 Monitor T-score progression closely</li>';
+  else
+    recs='<li>✅ Maintain healthy lifestyle habits</li><li>🏃 Regular weight-bearing exercise</li><li>🥛 Calcium 1000mg/day and Vitamin D</li><li>📅 Annual bone density check recommended</li>';
+
+  // X-ray images
+  let imgHtml = '';
+  if (r.has_xray && r.xray_b64) {
+    const gradHtml = r.gradcam_b64 ? `
+      <div class="xray-card">
+        <img src="${r.gradcam_b64}" alt="Grad-CAM">
+        <div class="xray-lbl gradcam"><i class="fas fa-fire"></i> Grad-CAM Heatmap</div>
+      </div>` : '';
+    imgHtml = `
+    <hr class="divider">
+    <div class="section-title"><i class="fas fa-x-ray" style="color:var(--primary);"></i> X-Ray Analysis Images</div>
+    <div class="xray-pair">
+      <div class="xray-card">
+        <img src="${r.xray_b64}" alt="Original Scan">
+        <div class="xray-lbl original"><i class="fas fa-image"></i> Original Scan</div>
+      </div>
+      ${gradHtml}
+    </div>`;
+  }
+
+  document.getElementById('modalTitle').textContent    = (r.patient_name||'Patient') + ' — Full Report';
+  document.getElementById('modalSubtitle').textContent = (r.timestamp||'').slice(0,16) + ' · ' + (r.analysis_mode||'AI Analysis');
+
+  document.getElementById('modalBody').innerHTML = `
+    <div class="report-banner ${cls}">
+      <div style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;opacity:.7;margin-bottom:.3rem;">AI Diagnosis</div>
+      <div style="font-size:2rem;font-weight:900;line-height:1;">${risk}</div>
+      <div style="font-size:.85rem;opacity:.75;margin:.25rem 0 .65rem;">Confidence: <strong>${parseFloat(r.confidence||0).toFixed(1)}%</strong></div>
+      <div style="height:7px;background:rgba(0,0,0,.12);border-radius:4px;overflow:hidden;">
+        <div style="height:100%;width:${r.confidence||0}%;background:currentColor;border-radius:4px;"></div>
+      </div>
+    </div>
+
+    <div class="section-title"><i class="fas fa-user" style="color:var(--primary);"></i> Patient Details</div>
+    <div style="display:flex;flex-wrap:wrap;">
+      <span class="info-chip"><strong>Name:</strong>&nbsp;${r.patient_name||'N/A'}</span>
+      <span class="info-chip"><strong>Age:</strong>&nbsp;${r.age||'N/A'}</span>
+      <span class="info-chip"><strong>Gender:</strong>&nbsp;${r.gender||'N/A'}</span>
+      <span class="info-chip"><strong>BMI:</strong>&nbsp;${r.bmi||'N/A'}</span>
+      <span class="info-chip"><strong>T-Score:</strong>&nbsp;${r.t_score||'N/A'}</span>
+      <span class="info-chip"><strong>Z-Score:</strong>&nbsp;${r.z_score||'N/A'}</span>
+      <span class="info-chip"><strong>Mode:</strong>&nbsp;${r.analysis_mode||'N/A'}</span>
+    </div>
+
+    <hr class="divider">
+    <div class="section-title"><i class="fas fa-triangle-exclamation" style="color:#f6b93b;"></i> Risk Factors</div>
+    <div>${rfHtml}</div>
+
+    ${imgHtml}
+
+    <hr class="divider">
+    <div class="section-title"><i class="fas fa-lightbulb" style="color:#f6b93b;"></i> Clinical Recommendations</div>
+    <ul class="recs">${recs}</ul>
+  `;
+
+  document.getElementById('reportModal').style.display = 'flex';
+  document.getElementById('modalBox').scrollTop = 0;
+}
+
+function closeModal(e) {
+  if (e.target.id === 'reportModal')
+    document.getElementById('reportModal').style.display = 'none';
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') document.getElementById('reportModal').style.display = 'none';
+});
+</script>
+{% endblock %}

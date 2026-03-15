@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+{% block title %}Profile — OsteoAI{% endblock %}
+
+{% block extra_head %}
+<style>
+.ptab-btn{display:flex;align-items:center;gap:.5rem;padding:.7rem 1.25rem;border-radius:10px;border:2px solid var(--border);background:#fff;font-weight:600;font-size:.85rem;color:var(--text-secondary);cursor:pointer;transition:all .2s;width:100%;}
+.ptab-btn:hover{border-color:var(--primary-light);color:var(--primary);}
+.ptab-btn.active{border-color:var(--primary);background:rgba(26,111,196,.06);color:var(--primary);}
+.ptab-btn i{width:18px;text-align:center;}
+.ptab-panel{display:none !important;}
+.ptab-panel.active{display:block !important;}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Profile Header -->
+<div class="profile-header">
+  <div class="profile-avatar-lg"><i class="fas fa-user-doctor"></i></div>
+  <div class="profile-header-info">
+    <h2>{{ profile.get('name','User') }}</h2>
+    <p>{{ user_email }}</p>
+    <div style="display:flex;gap:.75rem;margin-top:.6rem;flex-wrap:wrap;">
+      <span style="font-size:.78rem;background:rgba(255,255,255,.15);padding:.25rem .65rem;border-radius:50px;display:flex;align-items:center;gap:.3rem;">
+        <i class="fas fa-venus-mars"></i> {{ profile.get('gender','—') }}
+      </span>
+      <span style="font-size:.78rem;background:rgba(255,255,255,.15);padding:.25rem .65rem;border-radius:50px;display:flex;align-items:center;gap:.3rem;">
+        <i class="fas fa-cake-candles"></i> {{ profile.get('age','—') }} years
+      </span>
+      <span style="font-size:.78rem;background:rgba(255,255,255,.15);padding:.25rem .65rem;border-radius:50px;display:flex;align-items:center;gap:.3rem;">
+        <i class="fas fa-tint"></i> {{ profile.get('blood_type','O+') }}
+      </span>
+      <span style="font-size:.78rem;background:rgba(6,194,112,.25);padding:.25rem .65rem;border-radius:50px;display:flex;align-items:center;gap:.3rem;">
+        <span class="status-dot status-online"></span> Active
+      </span>
+    </div>
+  </div>
+  <div style="margin-left:auto;">
+    <a href="{{ url_for('logout') }}" class="btn" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.3);padding:.5rem 1rem;font-size:.82rem;">
+      <i class="fas fa-right-from-bracket"></i> Sign Out
+    </a>
+  </div>
+</div>
+
+{% if msg %}
+<div class="alert alert-{{ msg[0] }}" style="margin-bottom:1rem;">
+  <i class="fas fa-{{ 'check-circle' if msg[0]=='success' else 'exclamation-triangle' }}"></i>
+  {{ msg[1] }}
+  <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+</div>
+{% endif %}
+
+<div class="col-1-2" style="align-items:start;">
+  <!-- Sidebar tabs -->
+  <div class="card">
+    <div class="card-body" style="display:flex;flex-direction:column;gap:.4rem;padding:1rem;">
+      <button class="ptab-btn active" id="tabBtn1" onclick="showPTab('tab1',this)">
+        <i class="fas fa-id-card"></i> My Information
+      </button>
+      <button class="ptab-btn" id="tabBtn2" onclick="showPTab('tab2',this)">
+        <i class="fas fa-file-medical"></i> Medical History
+      </button>
+      <button class="ptab-btn" id="tabBtn3" onclick="showPTab('tab3',this)">
+        <i class="fas fa-lock"></i> Security &amp; Password
+      </button>
+      <hr style="border-color:var(--border);margin:.5rem 0;">
+      <a href="{{ url_for('assessment') }}" class="btn btn-primary" style="width:100%;">
+        <i class="fas fa-microscope"></i> New Assessment
+      </a>
+      <a href="{{ url_for('health_history') }}" class="btn btn-secondary" style="width:100%;">
+        <i class="fas fa-chart-line"></i> View History
+      </a>
+    </div>
+  </div>
+
+  <!-- Tab panels -->
+  <div>
+    <!-- Tab 1: My Information -->
+    <div id="tab1" class="ptab-panel active">
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-user-edit" style="color:var(--primary);"></i>
+          <h3>Personal Information</h3>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('profile') }}">
+            <input type="hidden" name="action" value="update_profile">
+            <div class="two-col">
+              <div class="form-group">
+                <label class="form-label"><i class="fas fa-user"></i> Full Name</label>
+                <input type="text" name="name" class="form-control" value="{{ profile.get('name','') }}" placeholder="Your full name" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label"><i class="fas fa-cake-candles"></i> Age</label>
+                <input type="number" name="age" class="form-control" value="{{ profile.get('age',30) }}" min="18" max="120">
+              </div>
+              <div class="form-group">
+                <label class="form-label"><i class="fas fa-venus-mars"></i> Gender</label>
+                <select name="gender" class="form-select">
+                  <option {% if profile.get('gender','Female')=='Female' %}selected{% endif %}>Female</option>
+                  <option {% if profile.get('gender')=='Male' %}selected{% endif %}>Male</option>
+                  <option {% if profile.get('gender')=='Other' %}selected{% endif %}>Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label"><i class="fas fa-phone"></i> Phone Number</label>
+                <input type="text" name="phone" class="form-control" value="{{ profile.get('phone','') }}" placeholder="+91 00000 00000">
+              </div>
+              <div class="form-group">
+                <label class="form-label"><i class="fas fa-tint"></i> Blood Type</label>
+                <select name="blood_type" class="form-select">
+                  {% for bt in ['A+','A-','B+','B-','O+','O-','AB+','AB-'] %}
+                  <option {% if profile.get('blood_type','O+')==bt %}selected{% endif %}>{{ bt }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label"><i class="fas fa-envelope"></i> Email Address</label>
+                <input type="email" class="form-control" value="{{ user_email }}" disabled style="opacity:.6;cursor:not-allowed;background:#f8fafc;">
+                <small style="font-size:.75rem;color:var(--text-muted);">Email cannot be changed</small>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top:.5rem;">
+              <i class="fas fa-save"></i> Save Changes
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Medical History -->
+    <div id="tab2" class="ptab-panel">
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-heart-pulse" style="color:var(--primary);"></i>
+          <h3>Medical History</h3>
+          <a href="{{ url_for('health_history') }}" class="btn btn-secondary" style="margin-left:auto;padding:.35rem .85rem;font-size:.78rem;">
+            <i class="fas fa-external-link-alt"></i> Full History
+          </a>
+        </div>
+        <div class="card-body">
+          {% if history %}
+          <div class="metrics-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.5rem;">
+            <div class="metric-card">
+              <div class="metric-icon blue"><i class="fas fa-clipboard-check"></i></div>
+              <div class="metric-body">
+                <div class="metric-label">Total Assessments</div>
+                <div class="metric-value">{{ history|length }}</div>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon green"><i class="fas fa-chart-line"></i></div>
+              <div class="metric-body">
+                <div class="metric-label">Latest Risk</div>
+                <div class="metric-value" style="font-size:1rem;">{{ history[0].get('prediction','-') }}</div>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-icon amber"><i class="fas fa-calendar"></i></div>
+              <div class="metric-body">
+                <div class="metric-label">Last Visit</div>
+                <div class="metric-value" style="font-size:.9rem;">{{ history[0].get('timestamp','-')[:10] }}</div>
+              </div>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>#</th><th>Date &amp; Time</th><th>Patient</th>
+                  <th>Risk Level</th><th>Confidence</th><th>T-Score</th><th>Mode</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for r in history %}
+                {% set risk = r.get('prediction','Normal') %}
+                {% if risk == 'Normal' %}{% set badge = 'badge-normal' %}
+                {% elif risk == 'Osteopenia' %}{% set badge = 'badge-osteopenia' %}
+                {% else %}{% set badge = 'badge-osteoporosis' %}{% endif %}
+                <tr>
+                  <td>{{ loop.index }}</td>
+                  <td style="white-space:nowrap;font-size:.82rem;">{{ r.get('timestamp','')[:16] or '-' }}</td>
+                  <td><strong>{{ r.get('patient_name') or (r.get('patient_data') or {}).get('name','-') }}</strong></td>
+                  <td><span class="badge {{ badge }}">{{ risk }}</span></td>
+                  <td><strong>{{ "%.1f"|format(r.get('confidence',0)|float) }}%</strong></td>
+                  <td>{{ r.get('t_score','-') }}</td>
+                  <td style="font-size:.75rem;color:var(--text-muted);">{{ (r.get('analysis_mode') or '-')[:22] }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div style="text-align:center;padding:3rem 1rem;">
+            <i class="fas fa-file-medical" style="font-size:3rem;color:var(--border);display:block;margin-bottom:.75rem;"></i>
+            <h3 style="color:var(--text-muted);font-size:1rem;margin-bottom:.5rem;">No Medical Records Yet</h3>
+            <p style="color:var(--text-muted);font-size:.88rem;">Complete a Risk Assessment to start building your health history.</p>
+            <a href="{{ url_for('assessment') }}" class="btn btn-primary" style="margin-top:1.25rem;">
+              <i class="fas fa-microscope"></i> Start Assessment
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+        <!-- Tab 3: Security -->
+    <div id="tab3" class="ptab-panel">
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-shield-halved" style="color:var(--primary);"></i>
+          <h3>Security &amp; Password</h3>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('profile') }}">
+            <input type="hidden" name="action" value="change_password">
+            <div class="form-group">
+              <label class="form-label"><i class="fas fa-lock"></i> Current Password</label>
+              <div style="position:relative;">
+                <input type="password" name="old_password" id="oldPwd" class="form-control" placeholder="Enter current password" style="padding-right:2.5rem;">
+                <button type="button" onclick="togglePwd('oldPwd','eyeOld')" style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);">
+                  <i class="fas fa-eye" id="eyeOld"></i>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label"><i class="fas fa-key"></i> New Password</label>
+              <div style="position:relative;">
+                <input type="password" name="new_password" id="newPwd" class="form-control" placeholder="At least 6 characters" style="padding-right:2.5rem;" oninput="checkStrength(this.value)">
+                <button type="button" onclick="togglePwd('newPwd','eyeNew')" style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);">
+                  <i class="fas fa-eye" id="eyeNew"></i>
+                </button>
+              </div>
+              <div id="strengthBar" style="margin-top:.4rem;height:4px;border-radius:2px;background:var(--border);overflow:hidden;"><div id="strengthFill" style="height:100%;width:0%;background:#e53e3e;transition:all .3s;border-radius:2px;"></div></div>
+              <div id="strengthLabel" style="font-size:.73rem;color:var(--text-muted);margin-top:.2rem;"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label"><i class="fas fa-check-double"></i> Confirm New Password</label>
+              <input type="password" name="confirm_password" class="form-control" placeholder="Re-enter new password">
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-key"></i> Update Password
+            </button>
+          </form>
+
+          <hr style="border-color:var(--border);margin:1.5rem 0;">
+          <div style="font-size:.85rem;font-weight:700;color:var(--text-primary);margin-bottom:.75rem;">
+            <i class="fas fa-shield-check" style="color:var(--secondary);"></i> Security Status
+          </div>
+          <div style="display:flex;flex-direction:column;gap:.5rem;font-size:.82rem;">
+            <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem .85rem;background:#f0fdf4;border-radius:8px;color:#15803d;">
+              <i class="fas fa-check-circle"></i> SHA-256 password encryption enabled
+            </div>
+            <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem .85rem;background:#f0fdf4;border-radius:8px;color:#15803d;">
+              <i class="fas fa-check-circle"></i> MongoDB Atlas secure cloud storage
+            </div>
+            <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem .85rem;background:#f0fdf4;border-radius:8px;color:#15803d;">
+              <i class="fas fa-check-circle"></i> Flask session-based authentication
+            </div>
+            <div style="display:flex;align-items:center;gap:.5rem;padding:.6rem .85rem;background:#eff6ff;border-radius:8px;color:var(--primary);">
+              <i class="fas fa-info-circle"></i> Logged in as: <strong>{{ user_email }}</strong>
+            </div>
+          </div>
+
+          <div style="margin-top:1.5rem;">
+            <a href="{{ url_for('logout') }}" class="btn btn-danger btn-full" style="background:rgba(229,62,62,.08);color:var(--danger);border:1.5px solid rgba(229,62,62,.25);">
+              <i class="fas fa-right-from-bracket"></i> Sign Out of All Sessions
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end tab panels col -->
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Profile tab switching
+function showPTab(tabId, btn) {
+  // Hide all panels
+  var panels = document.querySelectorAll('.ptab-panel');
+  panels.forEach(function(p) { 
+    p.classList.remove('active'); 
+    p.style.display = 'none';
+  });
+  // Remove active from all buttons
+  document.querySelectorAll('.ptab-btn').forEach(function(b) { b.classList.remove('active'); });
+  // Show selected panel
+  var panel = document.getElementById(tabId);
+  if (panel) { panel.classList.add('active'); panel.style.display = 'block'; }
+  if (btn) btn.classList.add('active');
+}
+
+// Init: show only the active panel
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.ptab-panel').forEach(function(p) {
+    if (!p.classList.contains('active')) { p.style.display = 'none'; }
+    else { p.style.display = 'block'; }
+  });
+});
+
+// Auto-activate tab from URL hash
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = window.location.hash;
+  if (hash === '#security') { showPTab('tab3', document.getElementById('tabBtn3')); }
+  else if (hash === '#history') { showPTab('tab2', document.getElementById('tabBtn2')); }
+});
+
+function togglePwd(inputId, iconId) {
+  const inp = document.getElementById(inputId);
+  const ico = document.getElementById(iconId);
+  if (inp.type === 'password') { inp.type = 'text'; ico.className = 'fas fa-eye-slash'; }
+  else { inp.type = 'password'; ico.className = 'fas fa-eye'; }
+}
+
+function checkStrength(pw) {
+  const fill = document.getElementById('strengthFill');
+  const label = document.getElementById('strengthLabel');
+  let score = 0;
+  if (pw.length >= 6) score++;
+  if (pw.length >= 10) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const pct = (score / 5) * 100;
+  const colors = ['#e53e3e','#f6b93b','#f6b93b','#06c270','#06c270'];
+  const labels = ['','Weak','Fair','Good','Strong'];
+  fill.style.width = pct + '%';
+  fill.style.background = colors[score - 1] || '#e53e3e';
+  label.textContent = labels[score] || '';
+}
+</script>
+{% endblock %}

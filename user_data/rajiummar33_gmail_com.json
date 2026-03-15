@@ -1,0 +1,108 @@
+{
+  "profile": {
+    "name": "charan",
+    "age": 65,
+    "gender": "Female",
+    "phone": "",
+    "blood_type": "",
+    "role": "patient",
+    "specialty": "",
+    "hospital": "",
+    "license": ""
+  },
+  "history": [
+    {
+      "timestamp": "2026-03-12 10:55",
+      "patient_name": "charan",
+      "prediction": "Normal",
+      "confidence": 90.0,
+      "age": 50,
+      "gender": "Female",
+      "bmi": 25.7,
+      "t_score": 0.7,
+      "z_score": 0.2,
+      "analysis_mode": "X-Ray Uploaded (Tabular)",
+      "risk_factors": [
+        [
+          "Alcohol Use",
+          "fas fa-wine-glass",
+          "warning"
+        ],
+        [
+          "Arthritis",
+          "fas fa-joint",
+          "warning"
+        ]
+      ],
+      "has_xray": true,
+      "xray_file": "xray_20260312_105511_135744.jpg",
+      "gradcam_file": "gradcam_20260312_105511_135744.png"
+    },
+    {
+      "timestamp": "2026-03-12 10:56",
+      "patient_name": "charan",
+      "prediction": "Osteopenia",
+      "confidence": 78.0,
+      "age": 50,
+      "gender": "Female",
+      "bmi": 25.7,
+      "t_score": -1.0,
+      "z_score": -0.5,
+      "analysis_mode": "T-Score Rule-Based",
+      "risk_factors": [
+        [
+          "Low T-Score",
+          "fas fa-chart-line",
+          "warning"
+        ]
+      ],
+      "has_xray": false,
+      "xray_file": "",
+      "gradcam_file": ""
+    },
+    {
+      "timestamp": "2026-03-12 10:56",
+      "patient_name": "charan",
+      "prediction": "Osteopenia",
+      "confidence": 78.0,
+      "age": 50,
+      "gender": "Female",
+      "bmi": 25.7,
+      "t_score": -1.0,
+      "z_score": -0.5,
+      "analysis_mode": "T-Score Rule-Based",
+      "risk_factors": [
+        [
+          "Low T-Score",
+          "fas fa-chart-line",
+          "warning"
+        ]
+      ],
+      "has_xray": false,
+      "xray_file": "",
+      "gradcam_file": ""
+    },
+    {
+      "timestamp": "2026-03-12 10:57",
+      "patient_name": "charan",
+      "prediction": "Osteopenia",
+      "confidence": 78.0,
+      "age": 50,
+      "gender": "Female",
+      "bmi": 25.7,
+      "t_score": -1.0,
+      "z_score": -0.5,
+      "analysis_mode": "T-Score Rule-Based",
+      "risk_factors": [
+        [
+          "Low T-Score",
+          "fas fa-chart-line",
+          "warning"
+        ]
+      ],
+      "has_xray": false,
+      "xray_file": "",
+      "gradcam_file": ""
+    }
+  ]
+}

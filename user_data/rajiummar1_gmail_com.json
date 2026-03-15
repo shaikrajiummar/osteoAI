@@ -1,0 +1,81 @@
+{
+  "profile": {
+    "name": "SHAIK RAJIUMMAR",
+    "age": 20,
+    "gender": "Male",
+    "phone": "",
+    "blood_type": "O+",
+    "role": "patient",
+    "specialty": "",
+    "hospital": "",
+    "license": ""
+  },
+  "history": [
+    {
+      "timestamp": "2026-03-07 01:19",
+      "patient_name": "SHAIK RAJIUMMAR",
+      "prediction": "Normal",
+      "confidence": 90.0,
+      "age": 50,
+      "gender": "Female",
+      "bmi": 25.7,
+      "t_score": -1.0,
+      "z_score": -0.5,
+      "analysis_mode": "X-Ray Uploaded (Tabular)",
+      "risk_factors": [
+        [
+          "Low T-Score",
+          "fas fa-chart-line",
+          "warning"
+        ]
+      ],
+      "has_xray": true,
+      "xray_file": "xray_20260307_011949_819789.jpeg",
+      "gradcam_file": "gradcam_20260307_011949_819789.png"
+    },
+    {
+      "timestamp": "2026-03-07 01:19",
+      "patient_name": "SHAIK RAJIUMMAR",
+      "prediction": "Normal",
+      "confidence": 90.0,
+      "age": 50,
+      "gender": "Female",
+      "bmi": 25.7,
+      "t_score": -1.0,
+      "z_score": -0.5,
+      "analysis_mode": "X-Ray Uploaded (Tabular)",
+      "risk_factors": [
+        [
+          "Low T-Score",
+          "fas fa-chart-line",
+          "warning"
+        ]
+      ],
+      "has_xray": true,
+      "xray_file": "xray_20260307_011953_477614.jpeg",
+      "gradcam_file": "gradcam_20260307_011953_477614.png"
+    },
+    {
+      "timestamp": "2026-03-07 01:20",
+      "patient_name": "SHAIK RAJIUMMAR",
+      "prediction": "Osteopenia",
+      "confidence": 78.0,
+      "age": 50,
+      "gender": "Female",
+      "bmi": 25.7,
+      "t_score": -1.0,
+      "z_score": -0.5,
+      "analysis_mode": "T-Score Rule-Based",
+      "risk_factors": [
+        [
+          "Low T-Score",
+          "fas fa-chart-line",
+          "warning"
+        ]
+      ],
+      "has_xray": false,
+      "xray_file": "",
+      "gradcam_file": ""
+    }
+  ]
+}
