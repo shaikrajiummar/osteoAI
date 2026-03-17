@@ -132,17 +132,33 @@
     <div class="three-col">
       <!-- Normal X-ray -->
       <div class="gallery-card">
-        <img src="{{ url_for('static', filename='assets/temp_xray.png') }}" style="width:100%;height:200px;object-fit:cover;display:block;" alt="Normal knee X-ray">
+        <img src="{{ gallery.get('xray_url') or url_for('static', filename='assets/temp_xray.png') }}"
+             style="width:100%;height:200px;object-fit:cover;display:block;"
+             alt="Normal knee X-ray"
+             onerror="this.style.display='none';document.getElementById('xrayFallback').style.display='flex'">
+        <div id="xrayFallback" style="display:none;align-items:center;justify-content:center;height:200px;background:#f8fafc;border:1px dashed #e2e8f0;border-radius:10px;color:#64748b;font-weight:700;">
+          No X-ray available
+        </div>
         <div class="gallery-label normal"><i class="fas fa-check-circle"></i> Normal Bone — Dense, Uniform</div>
       </div>
       <!-- Grad-CAM / Osteoporosis -->
       <div class="gallery-card">
-        <img src="{{ url_for('static', filename='assets/temp_gradcam.png') }}" style="width:100%;height:200px;object-fit:cover;display:block;" alt="Grad-CAM Osteoporosis">
+        <img src="{{ gallery.get('gradcam_url') or url_for('static', filename='assets/temp_gradcam.png') }}"
+             style="width:100%;height:200px;object-fit:cover;display:block;"
+             alt="Grad-CAM Osteoporosis"
+             onerror="this.style.display='none';document.getElementById('gradcamFallback').style.display='flex'">
+        <div id="gradcamFallback" style="display:none;align-items:center;justify-content:center;height:200px;background:#fff7ed;border:1px dashed #fed7aa;border-radius:10px;color:#b45309;font-weight:800;">
+          Grad-CAM not available
+        </div>
         <div class="gallery-label osteoporosis"><i class="fas fa-fire"></i> Osteoporosis — Grad-CAM Heatmap</div>
       </div>
       <!-- Osteopenia X-ray comparison -->
       <div class="gallery-card">
-        <img src="{{ url_for('static', filename='assets/feature_importance.png') }}" style="width:100%;height:200px;object-fit:cover;display:block;background:#fff;" alt="Risk Factor Feature Importance">
+        <img src="{{ url_for('static', filename='assets/feature_importance.png') }}"
+             style="width:100%;height:200px;object-fit:cover;display:block;background:#fff;"
+             alt="Risk Factor Feature Importance"
+             onerror="this.style.display='none';document.getElementById('featImp').style.display='block'">
+        <div id="featImp" style="display:none;height:200px;"></div>
         <div class="gallery-label osteopenia"><i class="fas fa-chart-bar"></i> AI Risk Factor Importance</div>
       </div>
     </div>
@@ -201,5 +217,14 @@ Plotly.newPlot('modelPerfChart',[{
 }],{margin:{t:30,b:80,l:50,r:20},paper_bgcolor:'transparent',plot_bgcolor:'transparent',
   yaxis:{range:[80,100],gridcolor:'#f0f4f8',title:'Accuracy (%)'},
   xaxis:{tickangle:-15},height:260},{displayModeBar:false,responsive:true});
+
+(function(){
+  var el=document.getElementById('featImp');
+  if(el){
+    var feats=['T-Score','Age','BMI','Smoking','Alcohol','Activity','Calcium','FamilyHx','Steroids','Arthritis'];
+    var imp=[0.38,0.22,0.12,0.07,0.05,0.05,0.04,0.03,0.02,0.02].map(function(x){return x*100;});
+    Plotly.newPlot('featImp',[{x:imp.reverse(),y:feats.slice().reverse(),type:'bar',orientation:'h',marker:{color:'#1a6fc4'}}],{margin:{t:10,b:20,l:90,r:10},paper_bgcolor:'transparent',height:200},{displayModeBar:false,responsive:true});
+  }
+})();
 </script>
 {% endblock %}

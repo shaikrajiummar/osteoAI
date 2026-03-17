@@ -1,129 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>{% block title %}OsteoAI Medical{% endblock %}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet">
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}">
     {% block extra_head %}{% endblock %}
-</head>
-<body>
+  </head>
+  <body>
 
-<!-- NAVBAR -->
-<nav class="navbar">
-  <!-- LEFT: Logo -->
-  <div class="navbar-left">
-    <a href="{{ url_for('dashboard') }}" class="brand-logo">
-      <div class="logo-icon">
-        <!-- OsteoAI spine/DNA logo -->
-        <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Spine vertebrae -->
-          <rect x="10" y="1" width="6" height="4" rx="1.5" fill="white" opacity="0.95"/>
-          <rect x="10" y="7" width="6" height="4" rx="1.5" fill="white" opacity="0.95"/>
-          <rect x="10" y="13" width="6" height="4" rx="1.5" fill="white" opacity="0.95"/>
-          <rect x="10" y="19" width="6" height="4" rx="1.5" fill="white" opacity="0.95"/>
-          <!-- Spine cord line -->
-          <line x1="13" y1="1" x2="13" y2="25" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
-          <!-- Side branches left -->
-          <line x1="10" y1="3" x2="4" y2="3" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
-          <line x1="10" y1="9" x2="4" y2="9" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
-          <line x1="10" y1="15" x2="4" y2="15" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
-          <line x1="10" y1="21" x2="4" y2="21" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
-          <!-- Side branches right -->
-          <line x1="16" y1="3" x2="22" y2="3" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
-          <line x1="16" y1="9" x2="22" y2="9" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
-          <line x1="16" y1="15" x2="22" y2="15" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
-          <line x1="16" y1="21" x2="22" y2="21" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
-          <!-- AI pulse dot -->
-          <circle cx="13" cy="25" r="2" fill="#06c270"/>
-        </svg>
-      </div>
-      <div class="brand-text">
-        <span class="brand-name">OsteoAI</span>
-        <span class="brand-tagline">Bone Health Platform</span>
-      </div>
-    </a>
-  </div>
-
-  <!-- CENTER: Nav links -->
-  <div class="navbar-center">
-    <ul class="nav-links">
-      <li><a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint=='dashboard' %}active{% endif %}">
-        <i class="fas fa-house-medical"></i><span>Dashboard</span></a></li>
-      <li><a href="{{ url_for('assessment') }}" class="nav-link {% if request.endpoint=='assessment' %}active{% endif %}">
-        <i class="fas fa-microscope"></i><span>Assessment</span></a></li>
-      <li><a href="{{ url_for('cloud_analytics') }}" class="nav-link {% if request.endpoint=='cloud_analytics' %}active{% endif %}">
-        <i class="fas fa-chart-column"></i><span>Analytics</span></a></li>
-      <li><a href="{{ url_for('nutrition') }}" class="nav-link {% if request.endpoint=='nutrition' %}active{% endif %}">
-        <i class="fas fa-apple-whole"></i><span>Nutrition</span></a></li>
-      <li><a href="{{ url_for('exercise') }}" class="nav-link {% if request.endpoint=='exercise' %}active{% endif %}">
-        <i class="fas fa-dumbbell"></i><span>Exercise</span></a></li>
-      <li><a href="{{ url_for('doctor_locator') }}" class="nav-link {% if request.endpoint=='doctor_locator' %}active{% endif %}">
-        <i class="fas fa-hospital"></i><span>Specialists</span></a></li>
-      <li><a href="{{ url_for('ai_assistant') }}" class="nav-link {% if request.endpoint=='ai_assistant' %}active{% endif %}">
-        <i class="fas fa-robot"></i><span>AI Chat</span></a></li>
-      <li><a href="{{ url_for('health_history') }}" class="nav-link {% if request.endpoint=='health_history' %}active{% endif %}">
-        <i class="fas fa-chart-line"></i><span>History</span></a></li>
-      <li><a href="{{ url_for('architecture') }}" class="nav-link {% if request.endpoint=='architecture' %}active{% endif %}">
-        <i class="fas fa-diagram-project"></i><span>Architecture</span></a></li>
-    </ul>
-  </div>
-
-  <!-- RIGHT: Profile -->
-  <div class="navbar-right">
-    <a href="{{ url_for('profile') }}" class="profile-btn {% if request.endpoint=='profile' %}active{% endif %}">
-      <div class="avatar">
-        <i class="fas fa-user-doctor"></i>
-      </div>
-      <div class="profile-info">
-        <span class="profile-name">{{ (session.get('user_profile') or {}).get('name', (session.get('user') or {}).get('email','User').split('@')[0]) }}</span>
-        <span class="profile-role">Clinician</span>
-      </div>
-      <i class="fas fa-chevron-down" style="font-size:0.65rem;color:var(--text-muted);"></i>
-    </a>
-    <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
-      <i class="fas fa-right-from-bracket"></i>
-    </a>
-  </div>
-</nav>
-
-<!-- MAIN CONTENT -->
-<main class="main-content">
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for cat, msg in messages %}
-        <div class="alert alert-{{ cat }}" style="margin-bottom:1rem;">
-          <i class="fas fa-{{ 'check-circle' if cat=='success' else 'exclamation-triangle' }}"></i>
-          {{ msg }}
-          <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+    <div id="appIntro" class="intro-overlay">
+      <div class="intro-inner">
+        <div class="intro-logo">
+          <svg width="40" height="40" viewBox="0 0 26 26" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="1" width="6" height="4" rx="1.5" fill="white"
+              opacity="0.95" />
+            <rect x="10" y="7" width="6" height="4" rx="1.5" fill="white"
+              opacity="0.95" />
+            <rect x="10" y="13" width="6" height="4" rx="1.5" fill="white"
+              opacity="0.95" />
+            <rect x="10" y="19" width="6" height="4" rx="1.5" fill="white"
+              opacity="0.95" />
+            <line x1="13" y1="1" x2="13" y2="25" stroke="rgba(255,255,255,0.5)"
+              stroke-width="1.5" />
+          </svg>
         </div>
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
-  {% block content %}{% endblock %}
-</main>
-
-<!-- FOOTER -->
-<footer style="background:#fff;border-top:1px solid var(--border);padding:1.25rem 2rem;margin-top:3rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;">
-  <div style="display:flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--text-muted);">
-    <div class="logo-icon" style="width:28px;height:28px;font-size:.7rem;">
-      <svg width="16" height="16" viewBox="0 0 26 26" fill="none"><rect x="10" y="1" width="6" height="4" rx="1.5" fill="white" opacity="0.95"/><rect x="10" y="7" width="6" height="4" rx="1.5" fill="white" opacity="0.95"/><rect x="10" y="13" width="6" height="4" rx="1.5" fill="white" opacity="0.95"/></svg>
+        <div class="intro-brand">OsteoAI</div>
+        <div class="intro-dot"></div>
+      </div>
     </div>
-    <strong style="color:var(--primary);">OsteoAI</strong> Medical Platform &copy; 2025
-  </div>
-  <div style="font-size:.75rem;color:var(--text-muted);">
-    <i class="fas fa-shield-halved"></i> Not a substitute for professional medical advice
-  </div>
-</footer>
 
-{% block scripts %}{% endblock %}
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
-<script>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <!-- LEFT: Logo -->
+      <div class="navbar-left">
+        <a href="{{ url_for('dashboard') }}" class="brand-logo">
+          <div class="logo-icon">
+            <!-- OsteoAI spine/DNA logo -->
+            <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <!-- Spine vertebrae -->
+              <rect x="10" y="1" width="6" height="4" rx="1.5" fill="white"
+                opacity="0.95" />
+              <rect x="10" y="7" width="6" height="4" rx="1.5" fill="white"
+                opacity="0.95" />
+              <rect x="10" y="13" width="6" height="4" rx="1.5" fill="white"
+                opacity="0.95" />
+              <rect x="10" y="19" width="6" height="4" rx="1.5" fill="white"
+                opacity="0.95" />
+              <!-- Spine cord line -->
+              <line x1="13" y1="1" x2="13" y2="25"
+                stroke="rgba(255,255,255,0.4)" stroke-width="1.5" />
+              <!-- Side branches left -->
+              <line x1="10" y1="3" x2="4" y2="3" stroke="white"
+                stroke-width="1.5" stroke-linecap="round" opacity="0.7" />
+              <line x1="10" y1="9" x2="4" y2="9" stroke="white"
+                stroke-width="1.5" stroke-linecap="round" opacity="0.7" />
+              <line x1="10" y1="15" x2="4" y2="15" stroke="white"
+                stroke-width="1.5" stroke-linecap="round" opacity="0.7" />
+              <line x1="10" y1="21" x2="4" y2="21" stroke="white"
+                stroke-width="1.5" stroke-linecap="round" opacity="0.7" />
+              <!-- Side branches right -->
+              <line x1="16" y1="3" x2="22" y2="3" stroke="white"
+                stroke-width="1.5" stroke-linecap="round" opacity="0.7" />
+              <line x1="16" y1="9" x2="22" y2="9" stroke="white"
+                stroke-width="1.5" stroke-linecap="round" opacity="0.7" />
+              <line x1="16" y1="15" x2="22" y2="15" stroke="white"
+                stroke-width="1.5" stroke-linecap="round" opacity="0.7" />
+              <line x1="16" y1="21" x2="22" y2="21" stroke="white"
+                stroke-width="1.5" stroke-linecap="round" opacity="0.7" />
+              <!-- AI pulse dot -->
+              <circle cx="13" cy="25" r="2" fill="#06c270" />
+            </svg>
+          </div>
+          <div class="brand-text">
+            <span class="brand-name">OsteoAI</span>
+            <span class="brand-tagline">Bone Health Platform</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- CENTER: Nav links -->
+      <div class="navbar-center">
+        <ul class="nav-links">
+          <li><a href="{{ url_for('dashboard') }}"
+              class="nav-link {% if request.endpoint=='dashboard' %}active{% endif %}">
+              <i
+                class="fas fa-house-medical"></i><span>Dashboard</span></a></li>
+          <li><a href="{{ url_for('assessment') }}"
+              class="nav-link {% if request.endpoint=='assessment' %}active{% endif %}">
+              <i class="fas fa-microscope"></i><span>Assessment</span></a></li>
+          <li><a href="{{ url_for('cloud_analytics') }}"
+              class="nav-link {% if request.endpoint=='cloud_analytics' %}active{% endif %}">
+              <i class="fas fa-chart-column"></i><span>Analytics</span></a></li>
+          <li><a href="{{ url_for('nutrition') }}"
+              class="nav-link {% if request.endpoint=='nutrition' %}active{% endif %}">
+              <i class="fas fa-apple-whole"></i><span>Nutrition</span></a></li>
+          <li><a href="{{ url_for('exercise') }}"
+              class="nav-link {% if request.endpoint=='exercise' %}active{% endif %}">
+              <i class="fas fa-dumbbell"></i><span>Exercise</span></a></li>
+          <li><a href="{{ url_for('doctor_locator') }}"
+              class="nav-link {% if request.endpoint=='doctor_locator' %}active{% endif %}">
+              <i class="fas fa-hospital"></i><span>Specialists</span></a></li>
+          <li><a href="{{ url_for('ai_assistant') }}"
+              class="nav-link {% if request.endpoint=='ai_assistant' %}active{% endif %}">
+              <i class="fas fa-robot"></i><span>AI Chat</span></a></li>
+          <li><a href="{{ url_for('health_history') }}"
+              class="nav-link {% if request.endpoint=='health_history' %}active{% endif %}">
+              <i class="fas fa-chart-line"></i><span>History</span></a></li>
+          <li><a href="{{ url_for('architecture') }}"
+              class="nav-link {% if request.endpoint=='architecture' %}active{% endif %}">
+              <i
+                class="fas fa-diagram-project"></i><span>Architecture</span></a></li>
+        </ul>
+      </div>
+
+      <!-- RIGHT: Profile -->
+      <div class="navbar-right">
+        <a href="{{ url_for('profile') }}"
+          class="profile-btn {% if request.endpoint=='profile' %}active{% endif %}">
+          <div class="avatar">
+            <i class="fas fa-user-doctor"></i>
+          </div>
+          <div class="profile-info">
+            <span class="profile-name">{{ (session.get('user_profile') or
+              {}).get('name', (session.get('user') or
+              {}).get('email','User').split('@')[0]) }}</span>
+            <span class="profile-role">Clinician</span>
+          </div>
+          <i class="fas fa-chevron-down"
+            style="font-size:0.65rem;color:var(--text-muted);"></i>
+        </a>
+        <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
+          <i class="fas fa-right-from-bracket"></i>
+        </a>
+      </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      {% for cat, msg in messages %}
+      <div class="alert alert-{{ cat }}" style="margin-bottom:1rem;">
+        <i
+          class="fas fa-{{ 'check-circle' if cat=='success' else 'exclamation-triangle' }}"></i>
+        {{ msg }}
+        <button class="alert-close"
+          onclick="this.parentElement.remove()">×</button>
+      </div>
+      {% endfor %}
+      {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- FOOTER -->
+    <footer
+      style="background:#fff;border-top:1px solid var(--border);padding:1.25rem 2rem;margin-top:3rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;">
+      <div
+        style="display:flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--text-muted);">
+        <div class="logo-icon" style="width:28px;height:28px;font-size:.7rem;">
+          <svg width="16" height="16" viewBox="0 0 26 26" fill="none"><rect
+              x="10" y="1" width="6" height="4" rx="1.5" fill="white"
+              opacity="0.95" /><rect x="10" y="7" width="6" height="4" rx="1.5"
+              fill="white" opacity="0.95" /><rect x="10" y="13" width="6"
+              height="4" rx="1.5" fill="white" opacity="0.95" /></svg>
+        </div>
+        <strong style="color:var(--primary);">OsteoAI</strong> Medical Platform
+        &copy; 2025
+      </div>
+      <div style="font-size:.75rem;color:var(--text-muted);">
+        <i class="fas fa-shield-halved"></i> Not a substitute for professional
+        medical advice
+      </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
 // Auto-dismiss alerts after 5s
 setTimeout(()=>{
   document.querySelectorAll('.alert').forEach(a=>{
@@ -131,6 +198,25 @@ setTimeout(()=>{
     setTimeout(()=>a.remove(),500);
   });
 },5000);
+(function(){
+  var o=document.getElementById('appIntro');
+  var shown=false; try{ shown=sessionStorage.getItem('introShown')==='1'; }catch(e){}
+  if(shown){
+    document.body.classList.add('is-ready');
+    if(o){ o.style.display='none'; }
+    return;
+  }
+  var r=function(){
+    document.body.classList.add('is-ready');
+    if(o){
+      o.classList.add('hide');
+      setTimeout(function(){ o.style.display='none'; },500);
+    }
+    try{ sessionStorage.setItem('introShown','1'); }catch(e){}
+  };
+  if(document.readyState==='complete'||document.readyState==='interactive'){ setTimeout(r,200); }
+  else{ document.addEventListener('DOMContentLoaded',function(){ setTimeout(r,200); }); }
+})();
 </script>
-</body>
+  </body>
 </html>

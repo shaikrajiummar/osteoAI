@@ -1473,6 +1473,7 @@ function showView(v,el){
   if(v==='tracking')     { if(typeof renderTracking==='function') renderTracking(); }
   if(v==='appointments') { if(typeof renderAppts==='function') renderAppts(); if(typeof buildHeatmap==='function') buildHeatmap(); }
   if(v==='inbox')        { if(typeof renderMessages==='function') renderMessages(); }
+  try { localStorage.setItem('docLastView', v); } catch(e){}
 }
 
 // ── HTML helpers ───────────────────────────────────────────────────────────────
@@ -1518,7 +1519,8 @@ function buildRecent(){
 }
 
 // ── Patient table (filterable) ─────────────────────────────────────────────────
-function filterPt(){
+var _ptTimer=null;
+function _filterPtCompute(){
   var q=(document.getElementById('ptSearch').value||'').toLowerCase();
   var d=(document.getElementById('ptDiag').value||'').toLowerCase();
   var g=(document.getElementById('ptGender').value||'').toLowerCase();
@@ -1528,6 +1530,10 @@ function filterPt(){
            (!g || (r.gender||'').toLowerCase()===g);
   });
   renderPtTable();
+}
+function filterPt(){
+  if(_ptTimer) clearTimeout(_ptTimer);
+  _ptTimer=setTimeout(_filterPtCompute, 180);
 }
 function renderPtTable(){
   var body=document.getElementById('ptBody');
@@ -2410,6 +2416,12 @@ function buildPerformanceGoals() {
   renderAppts();
   renderMessages();
   docToast('Portal loaded — ' + REC.length + ' assessments available', 'info', 3000);
+  try {
+    var last = localStorage.getItem('docLastView');
+    if (last && VIEWS.indexOf(last) !== -1 && last !== 'dashboard') {
+      showView(last);
+    }
+  } catch(e){}
 })();
 </script>
   </body>

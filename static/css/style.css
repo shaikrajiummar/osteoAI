@@ -479,6 +479,16 @@ input[type="range"]::-webkit-slider-thumb {
 .food-bar { background: var(--border); border-radius: 4px; height: 8px; overflow: hidden; margin-top: 0.35rem; }
 .food-bar-fill { height: 100%; background: linear-gradient(to right, var(--primary), var(--secondary)); border-radius: 4px; }
 
+.intro-overlay { position: fixed; inset: 0; background: #0b1d3a; color: #fff; z-index: 1200; display: flex; align-items: center; justify-content: center; transition: opacity .5s ease; }
+.intro-overlay.hide { opacity: 0; pointer-events: none; }
+.intro-inner { display: flex; flex-direction: column; align-items: center; gap: .75rem; }
+.intro-logo { width: 56px; height: 56px; display: grid; place-items: center; border-radius: 14px; background: rgba(255,255,255,.08); }
+.intro-brand { font-weight: 900; letter-spacing: .5px; font-size: 1.25rem; }
+.intro-dot { width: 8px; height: 8px; border-radius: 50%; background: #06c270; animation: pulseDot 1.2s ease infinite; }
+@keyframes pulseDot { 0%{ transform: scale(.8); opacity:.6 } 50%{ transform: scale(1.2); opacity:1 } 100%{ transform: scale(.8); opacity:.6 } }
+.main-content { opacity: 0; transform: translateY(8px); transition: opacity .4s ease, transform .4s ease; }
+body.is-ready .main-content { opacity: 1; transform: none; }
+
 /* ═══ RESPONSIVE ════════════════════════════════════════════ */
 @media (max-width: 1200px) {
     .metrics-grid { grid-template-columns: repeat(2, 1fr); }

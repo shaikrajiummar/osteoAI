@@ -255,7 +255,24 @@ def dashboard():
         {'id': 'P-1026', 'date': '2024-01-16', 'risk': 'Osteoporosis', 'confidence': '91%'},
         {'id': 'P-1027', 'date': '2024-01-16', 'risk': 'Normal',       'confidence': '95%'},
     ]
-    return render_template('dashboard.html', stats=stats, recent=recent)
+    gallery = {'xray_url': None, 'gradcam_url': None}
+    hist = session.get('assessment_history') or []
+    for r in reversed(hist):
+        xf = r.get('xray_file') or ''
+        gf = r.get('gradcam_file') or ''
+        if (xf or gf):
+            if xf:
+                try:
+                    gallery['xray_url'] = url_for('serve_upload', filename=xf)
+                except Exception:
+                    gallery['xray_url'] = None
+            if gf:
+                try:
+                    gallery['gradcam_url'] = url_for('serve_upload', filename=gf)
+                except Exception:
+                    gallery['gradcam_url'] = None
+            break
+    return render_template('dashboard.html', stats=stats, recent=recent, gallery=gallery)
 
 
 # ── Grad-CAM generator ──────────────────────────────────────────────────────

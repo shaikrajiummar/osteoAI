@@ -1,0 +1,37 @@
+{
+  "profile": {
+    "name": "chran",
+    "age": 18,
+    "gender": "Male",
+    "phone": "",
+    "blood_type": "",
+    "role": "patient",
+    "specialty": "",
+    "hospital": "",
+    "license": ""
+  },
+  "history": [
+    {
+      "timestamp": "2026-03-17 11:15",
+      "patient_name": "chran",
+      "prediction": "Normal",
+      "confidence": 90.0,
+      "age": 50,
+      "gender": "Female",
+      "bmi": 25.7,
+      "t_score": -1.0,
+      "z_score": -0.5,
+      "analysis_mode": "X-Ray Uploaded (Tabular)",
+      "risk_factors": [
+        [
+          "Low T-Score",
+          "fas fa-chart-line",
+          "warning"
+        ]
+      ],
+      "has_xray": true,
+      "xray_file": "xray_20260317_111520_128515.jpg",
+      "gradcam_file": "gradcam_20260317_111520_128515.png"
+    }
+  ]
+}
